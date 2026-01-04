@@ -1,0 +1,19 @@
+PyQt5==5.15.11
+qt-material==2.14
+QtAwesome==1.4.0
+python-vlc==3.0.21203
+ffmpeg-python==0.2.0
+requests==2.32.3
+win11toast; platform_system == "Windows"
+
+######################
+## GUI Packaging
+######################
+pyinstaller==6.11.1
+pillow==11.2.1
+
+######################
+# commands
+######################
+# pip install --upgrade pip
+# pip install -r requirements.txt
