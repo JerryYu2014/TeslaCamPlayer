@@ -64,8 +64,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            dist/**
-            *Setup.exe
+            TeslaCamPlayer*_Setup.exe
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -117,6 +116,6 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            **/*.pkg
+            **/TeslaCamPlayer*.pkg
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

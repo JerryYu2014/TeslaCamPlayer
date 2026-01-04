@@ -2,7 +2,7 @@
 
 ; 定义基本信息
 !define APP_NAME "TeslaCamPlayer"
-!define APP_VERSION "1.0.4"
+!define APP_VERSION "1.0.5"
 !define APP_PUBLISHER "CoreMotionSpace"
 !define APP_EXE "TeslaCamPlayer.exe"
 
