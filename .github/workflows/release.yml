@@ -30,7 +30,7 @@ jobs:
       - name: Build executable with PyInstaller
         run: |
           pip install pyinstaller
-          pyinstaller --noconfirm TeslaCamPlayer.spec
+          pyinstaller src/MainWindow.py --windowed --noconfirm --strip --name "TeslaCamPlayer" --add-data "src/assets/*:assets" --icon="src/assets/logo.ico"
 
       - name: Install NSIS
         run: |
@@ -81,7 +81,7 @@ jobs:
       - name: Build executable with PyInstaller (optional)
         run: |
           pip install pyinstaller
-          pyinstaller --noconfirm TeslaCamPlayer.spec
+          pyinstaller src/MainWindow.py --windowed --noconfirm --strip --name "TeslaCamPlayer" --add-data "src/assets/*:assets" --icon="src/assets/logo.ico"
 
       # NOTE: This step assumes that the Packages CLI tool `packagesbuild` is available
       # on the macOS runner. On GitHub-hosted runners it is not installed by default.
