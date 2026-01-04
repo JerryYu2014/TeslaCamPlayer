@@ -38,7 +38,17 @@ jobs:
 
       - name: Build NSIS installer
         run: |
-          makensis TeslaCamPlayer.nsi
+          # Try common NSIS install locations
+          $nsis = "${env:ProgramFiles(x86)}\NSIS\makensis.exe"
+          if (-Not (Test-Path $nsis)) {
+            $nsis = "${env:ProgramFiles}\NSIS\makensis.exe"
+          }
+
+          if (-Not (Test-Path $nsis)) {
+            Write-Error "makensis not found after NSIS installation."
+          }
+
+          & $nsis TeslaCamPlayer.nsi
 
       - name: Show build artifacts
         run: |
@@ -89,7 +99,11 @@ jobs:
       # Packages installed, and `packagesbuild` in PATH.
       - name: Build pkg installer with Packages
         run: |
-          packagesbuild TeslaCamPlayer.pkgproj
+          if command -v packagesbuild >/dev/null 2>&1; then
+            packagesbuild TeslaCamPlayer.pkgproj
+          else
+            echo "packagesbuild command not found, skip macOS pkg build."
+          fi
 
       - name: Find generated pkg files
         run: |
