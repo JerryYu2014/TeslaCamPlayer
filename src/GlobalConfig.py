@@ -18,7 +18,7 @@ def get_writable_path(folder_name):
 
 APP_NAME = "TeslaCam Player - TeslaCam播放器"
 # APP_VERSION = "1.0.5 Build 2025.12.11.01"
-APP_VERSION = "1.0.8"
+APP_VERSION = "1.0.9"
 APP_PATH = get_writable_path("")
 
 
