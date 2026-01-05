@@ -33,7 +33,7 @@ jobs:
       - name: Build executable with PyInstaller
         run: |
           pip install pyinstaller certifi
-          pyinstaller src/MainWindow.py --windowed --noconfirm --strip --name "TeslaCamPlayer" --add-data "src/assets/*:assets" --icon="src/assets/logo.ico"
+          pyinstaller src/MainWindow.py --windowed --noconfirm --strip --name "TeslaCamPlayer" --add-data "src/assets/*:assets" --icon="src/assets/logo.ico" --hidden-import ssl --hidden-import _ssl
 
       - name: Install NSIS
         run: |
@@ -101,7 +101,9 @@ jobs:
           pyinstaller src/MainWindow.py --windowed --noconfirm --strip \
             --name "TeslaCamPlayer" \
             --add-data "src/assets/*:assets" \
-            --icon="src/assets/logo.ico"
+            --icon="src/assets/logo.ico" \
+            --hidden-import ssl \
+            --hidden-import _ssl
 
       - name: Create DMG from .app
         run: |
