@@ -33,6 +33,7 @@ from Signal import Signal
 from TeslaCamPlayerWidget import TeslaCamPlayerWidget
 from ThemeManager import ThemeManager, ThemeMenu
 from NotificationSettingsDialog import NotificationSettingsDialog
+from DownloadUpdateDialog import DownloadUpdateDialog
 
 
 class TeslaCamPlayer(QMainWindow):
@@ -442,44 +443,18 @@ class TeslaCamPlayer(QMainWindow):
 
         url = asset.get("browser_download_url")
         name = asset.get("name", "installer")
-
-        # 下载文件
-        try:
-            tmp_dir = tempfile.gettempdir()
-            download_path = os.path.join(tmp_dir, name)
-
-            with requests.get(url, stream=True, timeout=60) as r:
-                r.raise_for_status()
-                with open(download_path, "wb") as f:
-                    for chunk in r.iter_content(chunk_size=8192):
-                        if chunk:
-                            f.write(chunk)
-        except Exception as ex:
-            QMessageBox.warning(self, "下载失败", f"安装包下载失败：{ex}")
+        if not url:
+            QMessageBox.warning(
+                self,
+                "无法下载",
+                "发布信息中缺少安装包下载地址，请前往 GitHub Releases 页面手动下载。",
+            )
+            webbrowser.open(f"https://github.com/{repo}/releases")
             return
 
-        # 启动安装程序
-        try:
-            if sys.platform.startswith("win"):
-                subprocess.Popen([download_path], shell=True)
-            elif sys.platform == "darwin":
-                subprocess.Popen(["open", download_path])
-            else:
-                QMessageBox.information(
-                    self,
-                    "安装提示",
-                    f"已下载安装包：{download_path}\n请手动运行完成安装。",
-                )
-                return
-
-            QMessageBox.information(
-                self,
-                "安装程序已启动",
-                "安装程序已启动，请按照向导完成升级。应用将现在退出。",
-            )
-            QApplication.instance().quit()
-        except Exception as ex:
-            QMessageBox.warning(self, "安装启动失败", f"无法启动安装程序：{ex}")
+        # 使用独立的下载进度窗体进行下载，避免主界面卡死
+        dlg = DownloadUpdateDialog(self, url, name)
+        dlg.exec_()
 
     def resizeEvent(self, event):
         # 获取屏幕分辨率
