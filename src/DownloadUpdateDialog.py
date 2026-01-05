@@ -46,7 +46,8 @@ class _DownloadWorker(QObject):
         try:
             download_path = self._download_path
             logger = logging.getLogger(__name__)
-            logger.info(f"Update download started: url={self._url}, path={download_path}, proxies={self._proxies!r}")
+            logger.info(
+                f"Update download started: url={self._url}, path={download_path}, proxies={self._proxies!r}")
 
             with requests.get(self._url, stream=True, timeout=60, proxies=self._proxies) as r:
                 r.raise_for_status()
@@ -66,7 +67,8 @@ class _DownloadWorker(QObject):
                                     os.remove(download_path)
                             except Exception:
                                 pass
-                            logger.info("Update download cancelled by user, temp file removed.")
+                            logger.info(
+                                "Update download cancelled by user, temp file removed.")
                             self.cancelled.emit()
                             return
 
@@ -77,10 +79,12 @@ class _DownloadWorker(QObject):
                                 percent = int(downloaded * 100 / total)
                                 self.progress.emit(percent)
 
-            logger.info(f"Update download finished successfully: path={download_path}, size={downloaded} bytes")
+            logger.info(
+                f"Update download finished successfully: path={download_path}, size={downloaded} bytes")
             self.finished.emit(download_path)
         except Exception as ex:
-            logging.getLogger(__name__).exception("Update download failed: %s", ex)
+            logging.getLogger(__name__).exception(
+                "Update download failed: %s", ex)
             self.error.emit(str(ex))
 
 
@@ -109,9 +113,10 @@ class DownloadUpdateDialog(QDialog):
         self._worker.error.connect(self._on_error)
         self._worker.cancelled.connect(self._on_cancelled)
 
-        # 线程结束时自动回收
+        # 任何结束状态都要让线程退出
         self._worker.finished.connect(self._thread.quit)
         self._worker.error.connect(self._thread.quit)
+        self._worker.cancelled.connect(self._thread.quit)
 
         self._init_ui()
         self._thread.start()
@@ -176,6 +181,8 @@ class DownloadUpdateDialog(QDialog):
     def _on_finished(self, download_path: str):
         # 下载完成，启动安装程序
         try:
+            logging.getLogger(__name__).info(
+                "Update download dialog: starting installer.")
             if sys.platform.startswith("win"):
                 subprocess.Popen([download_path], shell=True)
             elif sys.platform == "darwin":
@@ -186,16 +193,17 @@ class DownloadUpdateDialog(QDialog):
                     "安装提示",
                     f"已下载安装包：{download_path}\n请手动运行完成安装。",
                 )
+                # 其他平台仅关闭对话框即可
                 self.accept()
                 return
 
-            QMessageBox.information(
-                self,
-                "安装程序已启动",
-                "安装程序已启动，请按照向导完成升级。应用将现在退出。",
-            )
-            # 只关闭下载对话框，不再强制退出主程序
+            # Windows / macOS：启动安装程序后，直接退出整个应用
+            from PyQt5.QtWidgets import QApplication as _QApp
+
             self.accept()
+            logging.getLogger(__name__).info(
+                "Update download dialog: installer started, quitting application.")
+            _QApp.instance().quit()
         except Exception as ex:
             QMessageBox.warning(self, "安装启动失败", f"无法启动安装程序：{ex}")
             self.reject()
@@ -212,13 +220,17 @@ class DownloadUpdateDialog(QDialog):
     def _on_cancelled(self):
         """工作线程确认已取消并清理完成后关闭对话框。"""
         self.status_label.setText("已取消")
-        logging.getLogger(__name__).info("Update download dialog: cancelled acknowledged by worker.")
+        logging.getLogger(__name__).info(
+            "Update download dialog: cancelled acknowledged by worker.")
         self.reject()
 
     def closeEvent(self, event):
         # 用户直接关闭对话框时，视为取消
         if self._thread.isRunning():
             self._worker.cancel()
+            # 请求线程尽快结束并等待一小段时间，避免 QThread 销毁警告
+            self._thread.quit()
+            self._thread.wait(3000)
         return super().closeEvent(event)
 
     # ===== 额外功能：复制链接、打开文件夹、代理设置 =====
