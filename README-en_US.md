@@ -233,9 +233,10 @@ When you push a tag like `v1.0.x` to GitHub, the `C.Build and Release` workflow 
 - **Windows**:
   - `TeslaCamPlayer X.Y.Z_Setup.exe` — NSIS installer for Windows.
 - **macOS**:
-  - `TeslaCamPlayer-macOS-universal.dmg` — a **universal2** DMG that supports both Apple Silicon and Intel Macs.
+  - `TeslaCamPlayer-macOS-X64.dmg` — DMG for Intel Macs.
+  - `TeslaCamPlayer-macOS-ARM64.dmg` — DMG for Apple Silicon Macs.
 
-End users can simply download these files from the Releases page and install the app on their platform.
+End users can simply download the DMG that matches their Mac architecture from the Releases page and install the app.
 
 ### 2. Build installers
 

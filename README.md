@@ -232,10 +232,11 @@ pyinstaller --noconfirm TeslaCamPlayer.spec
 - **Windows**：
   - 生成并上传 `TeslaCamPlayer X.Y.Z_Setup.exe`（NSIS 安装包）。
 - **macOS**：
-  - 在 GitHub Actions 的 `macos-latest` Runner 上使用 PyInstaller 构建 **universal2** 应用，并打包为：
-    - `TeslaCamPlayer-macOS-universal.dmg`
+  - 在 GitHub Actions 的 macOS Runner 上使用 PyInstaller 分别构建 Intel 与 Apple Silicon 版本应用，并打包为：
+    - `TeslaCamPlayer-macOS-X64.dmg`（Intel 芯片）
+    - `TeslaCamPlayer-macOS-ARM64.dmg`（Apple Silicon 芯片）
 
-发布完成后，可以在 GitHub Releases 页面下载上述安装包直接安装运行。
+发布完成后，用户可以在 GitHub Releases 页面按自己 Mac 的架构下载对应 DMG 直接安装运行。
 
 ### 2. 构建安装包
 

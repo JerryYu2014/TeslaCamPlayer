@@ -71,8 +71,12 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   build-macos-dmg:
-    name: Build macOS universal DMG installer
-    runs-on: macos-latest
+    name: Build macOS DMG installers (Intel & Apple Silicon)
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        # macos-15: Intel, macos-latest: Apple Silicon
+        os: [macos-15, macos-latest]
 
     steps:
       - name: Checkout repository
@@ -91,11 +95,10 @@ jobs:
         run: |
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
-      - name: Build macOS universal2 app with PyInstaller
+      - name: Build macOS app with PyInstaller
         run: |
           pip install pyinstaller
           pyinstaller src/MainWindow.py --windowed --noconfirm --strip \
-            --target-arch universal2 \
             --name "TeslaCamPlayer" \
             --add-data "src/assets/*:assets" \
             --icon="src/assets/logo.ico"
@@ -109,7 +112,7 @@ jobs:
             exit 1
           fi
 
-          DMG_NAME="TeslaCamPlayer-macOS-universal.dmg"
+          DMG_NAME="TeslaCamPlayer-macOS-${{ runner.arch }}.dmg"
           echo "Creating DMG $DMG_NAME from $APP_PATH"
           hdiutil create -volname "TeslaCamPlayer" -srcfolder "$APP_PATH" -ov -format UDZO "dist/$DMG_NAME"
 
@@ -122,6 +125,6 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            dist/TeslaCamPlayer-macOS-universal.dmg
+            dist/TeslaCamPlayer-macOS-*.dmg
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
