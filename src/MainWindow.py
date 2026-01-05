@@ -34,6 +34,7 @@ from TeslaCamPlayerWidget import TeslaCamPlayerWidget
 from ThemeManager import ThemeManager, ThemeMenu
 from NotificationSettingsDialog import NotificationSettingsDialog
 from DownloadUpdateDialog import DownloadUpdateDialog
+from I18n import tr, set_language, get_current_language
 
 
 class TeslaCamPlayer(QMainWindow):
@@ -69,7 +70,7 @@ class TeslaCamPlayer(QMainWindow):
         """Set up the user interface, signals & slots"""
         # 设置窗体标题
         self.setWindowTitle(
-            f'{GlobalConfig.APP_NAME} {GlobalConfig.APP_VERSION}')
+            f'{tr("app.title")} {GlobalConfig.APP_VERSION}')
         # 设置窗体大小
         self.setGeometry(0, 0, 1000, 680)
         # 设置窗体居中
@@ -130,13 +131,13 @@ class TeslaCamPlayer(QMainWindow):
         # 创建托盘菜单
         menu = QMenu()
         # 打开文件夹
-        open_action = menu.addAction('打开文件夹')
+        open_action = menu.addAction(tr("menu.file.open_folder"))
         open_action.triggered.connect(
             lambda: self.browse_folder("inputType"))
         # 分隔线
         menu.addSeparator()
         # 退出
-        exit_action = menu.addAction('退出')
+        exit_action = menu.addAction(tr("menu.file.exit"))
         exit_action.triggered.connect(sys.exit)
         self.tray.setToolTip('TeslaCam Player')
         self.tray.setContextMenu(menu)
@@ -157,33 +158,53 @@ class TeslaCamPlayer(QMainWindow):
         # ****** 工具栏 ******
         menu_bar = self.menuBar()
         # File menu
-        file_menu = menu_bar.addMenu("文件")
+        file_menu = menu_bar.addMenu(tr("menu.file"))
         # 打开文件夹
-        open_folder_action = QAction("打开文件夹", self)
+        open_folder_action = QAction(tr("menu.file.open_folder"), self)
         open_folder_action.triggered.connect(
             lambda: self.browse_folder("inputType"))
         file_menu.addAction(open_folder_action)
         # 分隔线
         file_menu.addSeparator()
         # 退出
-        close_action = QAction("退出", self)
+        close_action = QAction(tr("menu.file.exit"), self)
         close_action.triggered.connect(sys.exit)
         file_menu.addAction(close_action)
 
-        settings_menu = menu_bar.addMenu("设置")
-        notify_action = QAction("通知设置", self)
+        settings_menu = menu_bar.addMenu(tr("menu.settings"))
+        notify_action = QAction(tr("menu.settings.notify"), self)
         notify_action.triggered.connect(self.open_notification_settings)
         settings_menu.addAction(notify_action)
 
+        # 语言子菜单
+        language_menu = settings_menu.addMenu(tr("menu.settings.language"))
+        self.action_lang_zh = QAction(
+            tr("menu.settings.language.zh"), self, checkable=True)
+        self.action_lang_en = QAction(
+            tr("menu.settings.language.en"), self, checkable=True)
+
+        current_lang = get_current_language()
+        if current_lang == "zh":
+            self.action_lang_zh.setChecked(True)
+        else:
+            self.action_lang_en.setChecked(True)
+
+        self.action_lang_zh.triggered.connect(
+            lambda: self.change_language("zh"))
+        self.action_lang_en.triggered.connect(
+            lambda: self.change_language("en"))
+        language_menu.addAction(self.action_lang_zh)
+        language_menu.addAction(self.action_lang_en)
+
         # 帮助菜单
-        help_menu = menu_bar.addMenu("帮助")
-        check_update_action = QAction("检查更新", self)
+        help_menu = menu_bar.addMenu(tr("menu.help"))
+        check_update_action = QAction(tr("menu.help.check_update"), self)
         check_update_action.triggered.connect(self.check_for_updates)
         help_menu.addAction(check_update_action)
 
         help_menu.addSeparator()
 
-        about_action = QAction("关于", self)
+        about_action = QAction(tr("menu.help.about"), self)
         about_action.triggered.connect(self.show_about_dialog)
         help_menu.addAction(about_action)
 
@@ -195,8 +216,9 @@ class TeslaCamPlayer(QMainWindow):
 
         vlcTips = None
         if not self.teslaCamPlayerWidget.is_vlc_installed():
-            vlcTips = "VLC 不可用： VLC 未安装"
-            QMessageBox.warning(self, '警告', 'VLC 未安装', QMessageBox.Yes)
+            vlcTips = "VLC 不可用： VLC 未安装"  # TODO: 可后续 i18n
+            QMessageBox.warning(self, '警告', 'VLC 未安装',
+                                QMessageBox.Yes)  # TODO: 可后续 i18n
         else:
             vlcTips = f"VLC 可用，版本：{self.teslaCamPlayerWidget.get_libvlc_version()}"
 
@@ -336,15 +358,34 @@ class TeslaCamPlayer(QMainWindow):
 
     # ******************** 帮助菜单：关于 & 检查更新 ********************
 
+    def change_language(self, lang: str):
+        """切换应用语言并提示用户重启后生效。"""
+        # 更新当前语言并写入配置文件
+        set_language(lang)
+
+        # 更新菜单勾选状态
+        if lang == "zh":
+            self.action_lang_zh.setChecked(True)
+            self.action_lang_en.setChecked(False)
+        else:
+            self.action_lang_zh.setChecked(False)
+            self.action_lang_en.setChecked(True)
+
+        # 提示需要重启
+        QMessageBox.information(
+            self,
+            tr("menu.settings.language"),
+            "语言设置已保存，请重新启动应用后生效。" if lang == "zh" else "Language setting has been saved. Please restart the application to apply it.",
+        )
+
     def show_about_dialog(self):
         """显示关于对话框"""
         text = (
-            f"<b>{GlobalConfig.APP_NAME}</b><br>"
-            f"版本：{GlobalConfig.APP_VERSION}<br><br>"
-            "TeslaCam Player 是一个针对 TeslaCam / Sentry Mode 视频的桌面播放器与管理工具，"
-            "支持浏览、预览、合成导出以及主题切换等功能。"
+            f"<b>{tr('app.title')}</b><br>"
+            f"Version: {GlobalConfig.APP_VERSION}<br><br>"
+            f"{tr('about.text')}"
         )
-        QMessageBox.about(self, "关于 TeslaCam Player", text)
+        QMessageBox.about(self, tr("about.title"), text)
 
     def _parse_version(self, version_str: str) -> tuple:
         """将版本号字符串解析为可比较的元组，仅提取 x.y.z 三段数字。"""
@@ -397,8 +438,8 @@ class TeslaCamPlayer(QMainWindow):
             resp.raise_for_status()
             data = resp.json()
         except Exception as ex:
-            QMessageBox.warning(self, "检查更新失败",
-                                f"请求 GitHub 最新版本信息失败：{ex}")
+            QMessageBox.warning(self, tr("update.check_failed.title"),
+                                f"{ex}")
             return
 
         latest_tag = data.get("tag_name") or ""
@@ -413,16 +454,18 @@ class TeslaCamPlayer(QMainWindow):
         if latest_version <= current_version:
             QMessageBox.information(
                 self,
-                "检查更新",
-                f"当前已是最新版本：{GlobalConfig.APP_VERSION}\n最新发布：{latest_name}",
+                tr("update.no_new.title"),
+                tr("update.no_new.text",
+                   current=GlobalConfig.APP_VERSION, latest=latest_name),
             )
             return
 
         # 发现新版本
         reply = QMessageBox.question(
             self,
-            "发现新版本",
-            f"检测到新版本：{latest_name}\n当前版本：{GlobalConfig.APP_VERSION}\n\n是否现在下载并安装？",
+            tr("update.has_new.title"),
+            tr("update.has_new.text", latest=latest_name,
+               current=GlobalConfig.APP_VERSION),
             QMessageBox.Yes | QMessageBox.No,
             QMessageBox.Yes,
         )
@@ -434,8 +477,8 @@ class TeslaCamPlayer(QMainWindow):
         if not asset:
             QMessageBox.warning(
                 self,
-                "无法下载",
-                "未找到与当前操作系统匹配的安装包，请前往 GitHub Releases 页面手动下载。",
+                tr("update.asset_missing.title"),
+                tr("update.asset_missing.text.os"),
             )
             # 打开 Releases 页面
             webbrowser.open(f"https://github.com/{repo}/releases")
@@ -446,8 +489,8 @@ class TeslaCamPlayer(QMainWindow):
         if not url:
             QMessageBox.warning(
                 self,
-                "无法下载",
-                "发布信息中缺少安装包下载地址，请前往 GitHub Releases 页面手动下载。",
+                tr("update.asset_missing.title"),
+                tr("update.asset_missing.text.url"),
             )
             webbrowser.open(f"https://github.com/{repo}/releases")
             return

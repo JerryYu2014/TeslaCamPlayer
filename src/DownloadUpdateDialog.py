@@ -24,6 +24,7 @@ from PyQt5.QtWidgets import (
 
 import requests
 import GlobalConfig
+from I18n import tr
 
 
 class _DownloadWorker(QObject):
@@ -122,21 +123,21 @@ class DownloadUpdateDialog(QDialog):
         self._thread.start()
 
     def _init_ui(self):
-        self.setWindowTitle("正在下载更新")
+        self.setWindowTitle(tr("download.title"))
         self.setModal(True)
         self.resize(520, 200)
 
         layout = QVBoxLayout(self)
 
-        self.label = QLabel("正在下载安装包，请稍候……", self)
+        self.label = QLabel(tr("download.label"), self)
         layout.addWidget(self.label)
 
         # 下载链接展示 + 复制按钮
         url_layout = QHBoxLayout()
-        url_label = QLabel("下载链接:", self)
+        url_label = QLabel(tr("download.url"), self)
         self.url_edit = QLineEdit(self._url, self)
         self.url_edit.setReadOnly(True)
-        copy_btn = QPushButton("复制", self)
+        copy_btn = QPushButton(tr("download.copy"), self)
         copy_btn.clicked.connect(self._copy_url)
         url_layout.addWidget(url_label)
         url_layout.addWidget(self.url_edit)
@@ -145,10 +146,10 @@ class DownloadUpdateDialog(QDialog):
 
         # 保存路径展示 + 打开文件夹按钮
         path_layout = QHBoxLayout()
-        path_label = QLabel("保存路径:", self)
+        path_label = QLabel(tr("download.path"), self)
         self.path_edit = QLineEdit(self._download_path, self)
         self.path_edit.setReadOnly(True)
-        open_btn = QPushButton("打开文件夹", self)
+        open_btn = QPushButton(tr("download.open_folder"), self)
         open_btn.clicked.connect(self._open_folder)
         path_layout.addWidget(path_label)
         path_layout.addWidget(self.path_edit)
@@ -165,9 +166,9 @@ class DownloadUpdateDialog(QDialog):
 
         # 底部按钮：取消 + 代理设置
         btn_layout = QHBoxLayout()
-        self.cancel_button = QPushButton("取消", self)
+        self.cancel_button = QPushButton(tr("download.cancel"), self)
         self.cancel_button.clicked.connect(self._on_cancel)
-        self.proxy_button = QPushButton("代理设置...", self)
+        self.proxy_button = QPushButton(tr("download.proxy_settings"), self)
         self.proxy_button.clicked.connect(self._open_proxy_settings)
         btn_layout.addWidget(self.cancel_button)
         btn_layout.addStretch(1)
@@ -205,11 +206,13 @@ class DownloadUpdateDialog(QDialog):
                 "Update download dialog: installer started, quitting application.")
             _QApp.instance().quit()
         except Exception as ex:
-            QMessageBox.warning(self, "安装启动失败", f"无法启动安装程序：{ex}")
+            QMessageBox.warning(self, tr("download.failed.title"), tr(
+                "download.failed.text", msg=str(ex)))
             self.reject()
 
     def _on_error(self, message: str):
-        QMessageBox.warning(self, "下载失败", f"安装包下载失败：{message}")
+        QMessageBox.warning(self, tr("download.failed.title"), tr(
+            "download.failed.text", msg=message))
         self.reject()
 
     def _on_cancel(self):
@@ -240,12 +243,13 @@ class DownloadUpdateDialog(QDialog):
 
         clipboard = _QApp.instance().clipboard()
         clipboard.setText(self._url or "")
-        QMessageBox.information(self, "复制成功", "下载链接已复制到剪贴板。")
+        QMessageBox.information(self, "", tr("download.copy.ok"))
 
     def _open_folder(self):
         folder = os.path.dirname(self._download_path)
         if not os.path.isdir(folder):
-            QMessageBox.warning(self, "路径不存在", f"文件夹不存在：{folder}")
+            QMessageBox.warning(self, "", tr(
+                "download.folder_missing", path=folder))
             return
         QDesktopServices.openUrl(QUrl.fromLocalFile(folder))
 
@@ -254,7 +258,7 @@ class DownloadUpdateDialog(QDialog):
         if dlg.exec_() == QDialog.Accepted:
             # 重新加载代理设置，下次下载生效
             self._proxies = self._load_proxy_config()
-            QMessageBox.information(self, "代理设置", "代理设置已保存，下次下载时生效。")
+            QMessageBox.information(self, "", tr("proxy.saved"))
 
     def _load_proxy_config(self):
         """从全局配置文件中读取代理设置，返回 requests 兼容的 proxies 字典或 None。"""
@@ -288,23 +292,22 @@ class ProxySettingsDialog(QDialog):
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setWindowTitle("代理设置")
+        self.setWindowTitle(tr("proxy.title"))
         self.resize(420, 160)
 
         layout = QVBoxLayout(self)
 
-        self.enable_checkbox = QCheckBox("启用代理下载", self)
+        self.enable_checkbox = QCheckBox(tr("proxy.enable"), self)
         layout.addWidget(self.enable_checkbox)
 
         row = QHBoxLayout()
-        row.addWidget(QLabel("代理地址:", self))
+        row.addWidget(QLabel(tr("proxy.label"), self))
         self.proxy_edit = QLineEdit(self)
-        self.proxy_edit.setPlaceholderText("例如：http://127.0.0.1:7890")
+        self.proxy_edit.setPlaceholderText(tr("proxy.placeholder"))
         row.addWidget(self.proxy_edit)
         layout.addLayout(row)
 
-        hint = QLabel(
-            "说明：仅用于更新下载请求，建议填写完整协议+主机+端口，例如 http://127.0.0.1:7890", self)
+        hint = QLabel(tr("proxy.hint"), self)
         hint.setWordWrap(True)
         layout.addWidget(hint)
 
