@@ -225,6 +225,18 @@ pyinstaller --noconfirm TeslaCamPlayer.spec
 
 > 根据你的实际需求和平台调整 `--add-data` 路径与图标文件位置。
 
+#### GitHub Actions 自动构建产物
+
+当你为仓库打上形如 `v1.0.x` 的 Tag 并推送到 GitHub 后，`C.Build and Release` 工作流会自动执行：
+
+- **Windows**：
+  - 生成并上传 `TeslaCamPlayer X.Y.Z_Setup.exe`（NSIS 安装包）。
+- **macOS**：
+  - 在 GitHub Actions 的 `macos-latest` Runner 上使用 PyInstaller 构建 **universal2** 应用，并打包为：
+    - `TeslaCamPlayer-macOS-universal.dmg`
+
+发布完成后，可以在 GitHub Releases 页面下载上述安装包直接安装运行。
+
 ### 2. 构建安装包
 
 #### Windows：NSIS 安装包

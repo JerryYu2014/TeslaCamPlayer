@@ -226,6 +226,17 @@ pyinstaller --noconfirm TeslaCamPlayer.spec
 
 > Adjust the `--add-data` paths and icon file according to your actual directory layout and platform.
 
+#### GitHub Actions auto-published artifacts
+
+When you push a tag like `v1.0.x` to GitHub, the `C.Build and Release` workflow runs automatically and publishes installable artifacts to the corresponding GitHub Release:
+
+- **Windows**:
+  - `TeslaCamPlayer X.Y.Z_Setup.exe` — NSIS installer for Windows.
+- **macOS**:
+  - `TeslaCamPlayer-macOS-universal.dmg` — a **universal2** DMG that supports both Apple Silicon and Intel Macs.
+
+End users can simply download these files from the Releases page and install the app on their platform.
+
 ### 2. Build installers
 
 #### Windows: NSIS installer
