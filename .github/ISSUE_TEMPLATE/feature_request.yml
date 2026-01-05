@@ -1,0 +1,55 @@
+name: Feature request
+description: Suggest an idea for TeslaCamPlayer
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢你对 **TeslaCamPlayer** 提出功能建议！
+        请尽量清晰描述你的需求和使用场景。
+
+  - type: input
+    id: summary
+    attributes:
+      label: 功能概述
+      description: 用一两句话概括你想要的功能。
+      placeholder: 比如：支持按标签筛选 TeslaCam 事件
+    validations:
+      required: true
+
+  - type: textarea
+    id: motivation
+    attributes:
+      label: 使用场景 / 解决的问题
+      description: 说明你在实际使用中遇到什么问题，这个功能能带来什么帮助。
+      placeholder: |
+        - 在什么情况下你会用到这个功能？
+        - 没有这个功能时，目前你是怎么做的？
+    validations:
+      required: true
+
+  - type: textarea
+    id: details
+    attributes:
+      label: 功能细节（可选）
+      description: 如果你已经想好了交互方式或界面布局，可以在这里详细描述。
+      placeholder: |
+        - 你希望在界面哪里看到这个功能？
+        - 是否有类似产品可以参考？
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: 优先级自评
+      options:
+        - nice to have
+        - important
+        - critical
+    validations:
+      required: false
+
+  - type: textarea
+    id: extra
+    attributes:
+      label: 其他补充
+      description: 任何你认为有帮助的补充信息或相关 Issue 链接。

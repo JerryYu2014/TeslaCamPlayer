@@ -1,0 +1,40 @@
+name: Create Release Tag
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version, e.g. v1.0.5'
+        required: true
+        type: string
+      title:
+        description: 'Release title (optional, default = version)'
+        required: false
+        type: string
+      body:
+        description: 'Release notes (markdown, optional)'
+        required: false
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  create-release:
+    name: Create tag and GitHub Release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Create GitHub Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.event.inputs.version }}
+          release_name: ${{ github.event.inputs.title || github.event.inputs.version }}
+          body: ${{ github.event.inputs.body }}
+          draft: false
+          prerelease: false

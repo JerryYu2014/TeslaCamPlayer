@@ -1,0 +1,67 @@
+name: Bug report
+description: Create a report to help us improve TeslaCamPlayer
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢你使用 **TeslaCamPlayer** 并提交 Bug 反馈！
+        请尽量完整填写以下信息，便于我们快速复现与修复问题。
+
+  - type: input
+    id: version
+    attributes:
+      label: App version / 应用版本
+      description: 比如 v1.0.5，或自行构建的 commit 哈希
+      placeholder: v1.0.5
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug 描述
+      description: 请清晰描述你遇到的问题和预期行为。
+      placeholder: 发生了什么？你本来希望看到什么结果？
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: 复现步骤
+      description: 按步骤说明如何触发该问题。
+      placeholder: |
+        1. 打开应用
+        2. ...
+        3. ...
+    validations:
+      required: true
+
+  - type: dropdown
+    id: os
+    attributes:
+      label: 操作系统
+      options:
+        - Windows 11
+        - Windows 10
+        - macOS (Apple Silicon)
+        - macOS (Intel)
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: 日志 / 截图
+      description: 如有错误日志、截图或屏幕录制，请在此粘贴或上传。
+      placeholder: 将日志粘贴到这里，或在下方附加图片文件。
+      render: shell
+
+  - type: textarea
+    id: extra
+    attributes:
+      label: 其他信息
+      description: 任何你认为有帮助的补充信息。
+      placeholder: 例如是否使用了特殊配置、第三方工具等。
