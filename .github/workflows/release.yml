@@ -70,9 +70,13 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  build-macos-pkg:
-    name: Build macOS pkg installer
-    runs-on: macos-latest
+  build-macos-dmg:
+    name: Build macOS DMG installers (Intel & Apple Silicon)
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        # macos-13: Intel, macos-latest (14+): Apple Silicon
+        os: [macos-13, macos-latest]
 
     steps:
       - name: Checkout repository
@@ -91,33 +95,36 @@ jobs:
         run: |
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
-      # Optional: build app bundle / executable first if needed by the pkg project
-      - name: Build executable with PyInstaller (optional)
+      - name: Build macOS app with PyInstaller
         run: |
           pip install pyinstaller
-          pyinstaller src/MainWindow.py --windowed --noconfirm --strip --name "TeslaCamPlayer" --add-data "src/assets/*:assets" --icon="src/assets/logo.ico"
+          pyinstaller src/MainWindow.py --windowed --noconfirm --strip \
+            --name "TeslaCamPlayer" \
+            --add-data "src/assets/*:assets" \
+            --icon="src/assets/logo.ico"
 
-      # NOTE: This step assumes that the Packages CLI tool `packagesbuild` is available
-      # on the macOS runner. On GitHub-hosted runners it is not installed by default.
-      # For fully automated pkg builds you may need a self-hosted macOS runner with
-      # Packages installed, and `packagesbuild` in PATH.
-      - name: Build pkg installer with Packages
+      - name: Create DMG from .app
         run: |
-          if command -v packagesbuild >/dev/null 2>&1; then
-            packagesbuild TeslaCamPlayer.pkgproj
-          else
-            echo "packagesbuild command not found, skip macOS pkg build."
+          APP_PATH="dist/TeslaCamPlayer.app"
+          if [ ! -d "$APP_PATH" ]; then
+            echo "App bundle $APP_PATH not found. PyInstaller output layout may have changed."
+            ls -R dist || true
+            exit 1
           fi
 
-      - name: Find generated pkg files
-        run: |
-          echo "Searching for .pkg files..."
-          find . -name "*.pkg" -maxdepth 4 -print
+          DMG_NAME="TeslaCamPlayer-macOS-${{ runner.arch }}.dmg"
+          echo "Creating DMG $DMG_NAME from $APP_PATH"
+          hdiutil create -volname "TeslaCamPlayer" -srcfolder "$APP_PATH" -ov -format UDZO "dist/$DMG_NAME"
 
-      - name: Upload macOS pkg to GitHub Release
+      - name: Show macOS build artifacts
+        run: |
+          echo "dist contents:"
+          ls -R dist
+
+      - name: Upload macOS DMG to GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            **/TeslaCamPlayer*.pkg
+            dist/TeslaCamPlayer-macOS-*.dmg
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
