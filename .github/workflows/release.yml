@@ -4,8 +4,6 @@ on:
   push:
     tags:
       - 'v*'
-  # release:
-  #   types: [published]
 
 permissions:
   contents: write
@@ -75,8 +73,10 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        # macos-15: Intel, macos-latest: Apple Silicon
-        os: [macos-15, macos-latest]
+        # # macos-15: Intel, macos-latest: Apple Silicon
+        # os: [macos-15, macos-latest]
+        # macos-15-intel: Intel, macos-latest: Apple Silicon
+        os: [macos-15-intel, macos-latest]
 
     steps:
       - name: Checkout repository
