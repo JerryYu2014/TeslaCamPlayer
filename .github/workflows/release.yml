@@ -33,7 +33,7 @@ jobs:
       - name: Build executable with PyInstaller
         run: |
           pip install pyinstaller certifi
-          pyinstaller src/MainWindow.py --windowed --noconfirm --strip --name "TeslaCamPlayer" --add-data "src/assets/*:assets" --icon="src/assets/logo.ico" --hidden-import ssl --hidden-import _ssl
+          pyinstaller src/MainWindow.py --windowed --noconfirm --strip --name "TeslaCamPlayer" --add-data "src/assets/*:assets" --icon="src/assets/logo.ico" --hidden-import ssl --hidden-import _ssl --hidden-import _hashlib --hidden-import certifi --collect-submodules certifi --collect-all urllib3
 
       - name: Install NSIS
         run: |
@@ -97,13 +97,17 @@ jobs:
 
       - name: Build macOS app with PyInstaller
         run: |
-          pip install pyinstaller
+          pip install pyinstaller certifi
           pyinstaller src/MainWindow.py --windowed --noconfirm --strip \
             --name "TeslaCamPlayer" \
             --add-data "src/assets/*:assets" \
             --icon="src/assets/logo.ico" \
             --hidden-import ssl \
-            --hidden-import _ssl
+            --hidden-import _ssl \
+            --hidden-import _hashlib \
+            --hidden-import certifi \
+            --collect-submodules certifi \
+            --collect-all urllib3
 
       - name: Create DMG from .app
         run: |
