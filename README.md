@@ -29,19 +29,19 @@ TeslaCamPlayer 是一个针对特斯拉行车记录仪（TeslaCam / Sentry Mode�
 
 ## 核心技术栈
 
-- **语言与运行环境**  
+- **语言与运行环境**
   - Python 3.9+（建议，具体以你本地环境为准）
-- **GUI 与界面相关**  
+- **GUI 与界面相关**
   - PyQt5 (`PyQt5`)
   - qt-material (`qt-material`)
   - QtAwesome (`QtAwesome`)
-- **多媒体与视频处理**  
+- **多媒体与视频处理**
   - python-vlc (`python-vlc`)
   - ffmpeg-python (`ffmpeg-python`)
-- **系统体验与工具**  
+- **系统体验与工具**
   - win11toast（Windows 通知）
   - requests（网络请求，若需要在线检查更新或下载资源）
-- **打包与分发**  
+- **打包与分发**
   - PyInstaller (`pyinstaller`)
   - Windows：NSIS 安装包
   - macOS：Packages pkg 安装包
@@ -198,8 +198,7 @@ pyinstaller src/MainWindow.py --windowed --noconfirm --name "TeslaCamPlayer"
 pyinstaller src/MainWindow.py --windowed --noconfirm --strip --name "TeslaCamPlayer"
 
 # 添加图标与资源文件
-pyinstaller src/MainWindow.py --windowed --noconfirm --strip --name "TeslaCamPlayer" \
-  --add-data "src/assets/*:assets" --icon="src/assets/logo.ico"
+pyinstaller src/MainWindow.py --windowed --noconfirm --strip --name "TeslaCamPlayer" --add-data "src/assets/*:assets" --icon="src/assets/logo.ico"
 
 # 使用 spec 文件（推荐，统一配置）
 pyinstaller --noconfirm TeslaCamPlayer.spec
@@ -257,4 +256,3 @@ pyinstaller --noconfirm TeslaCamPlayer.spec
 ## 许可证
 
 本项目基于 [MIT License](LICENSE) 开源，欢迎 Issue、PR 和功能建议。
-
