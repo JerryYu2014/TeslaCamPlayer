@@ -5,6 +5,7 @@ import sys
 import tempfile
 import subprocess
 import configparser
+import logging
 
 from PyQt5.QtCore import QObject, QThread, pyqtSignal, QUrl
 from PyQt5.QtGui import QDesktopServices
@@ -29,6 +30,7 @@ class _DownloadWorker(QObject):
     progress = pyqtSignal(int)  # 0-100
     finished = pyqtSignal(str)  # download_path
     error = pyqtSignal(str)
+    cancelled = pyqtSignal()    # 用户请求取消并已清理完成
 
     def __init__(self, url: str, download_path: str, proxies=None, parent=None):
         super().__init__(parent)
@@ -43,6 +45,8 @@ class _DownloadWorker(QObject):
     def run(self):
         try:
             download_path = self._download_path
+            logger = logging.getLogger(__name__)
+            logger.info(f"Update download started: url={self._url}, path={download_path}, proxies={self._proxies!r}")
 
             with requests.get(self._url, stream=True, timeout=60, proxies=self._proxies) as r:
                 r.raise_for_status()
@@ -62,6 +66,8 @@ class _DownloadWorker(QObject):
                                     os.remove(download_path)
                             except Exception:
                                 pass
+                            logger.info("Update download cancelled by user, temp file removed.")
+                            self.cancelled.emit()
                             return
 
                         if chunk:
@@ -71,8 +77,10 @@ class _DownloadWorker(QObject):
                                 percent = int(downloaded * 100 / total)
                                 self.progress.emit(percent)
 
+            logger.info(f"Update download finished successfully: path={download_path}, size={downloaded} bytes")
             self.finished.emit(download_path)
         except Exception as ex:
+            logging.getLogger(__name__).exception("Update download failed: %s", ex)
             self.error.emit(str(ex))
 
 
@@ -99,6 +107,7 @@ class DownloadUpdateDialog(QDialog):
         self._worker.progress.connect(self._on_progress)
         self._worker.finished.connect(self._on_finished)
         self._worker.error.connect(self._on_error)
+        self._worker.cancelled.connect(self._on_cancelled)
 
         # 线程结束时自动回收
         self._worker.finished.connect(self._thread.quit)
@@ -185,11 +194,8 @@ class DownloadUpdateDialog(QDialog):
                 "安装程序已启动",
                 "安装程序已启动，请按照向导完成升级。应用将现在退出。",
             )
-            # 关闭对话框并退出应用
+            # 只关闭下载对话框，不再强制退出主程序
             self.accept()
-            from PyQt5.QtWidgets import QApplication as _QApp
-
-            _QApp.instance().quit()
         except Exception as ex:
             QMessageBox.warning(self, "安装启动失败", f"无法启动安装程序：{ex}")
             self.reject()
@@ -202,6 +208,12 @@ class DownloadUpdateDialog(QDialog):
         self._worker.cancel()
         self.cancel_button.setEnabled(False)
         self.status_label.setText("正在取消，请稍候……")
+
+    def _on_cancelled(self):
+        """工作线程确认已取消并清理完成后关闭对话框。"""
+        self.status_label.setText("已取消")
+        logging.getLogger(__name__).info("Update download dialog: cancelled acknowledged by worker.")
+        self.reject()
 
     def closeEvent(self, event):
         # 用户直接关闭对话框时，视为取消
