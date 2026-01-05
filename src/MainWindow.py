@@ -12,6 +12,10 @@ import os
 import sys
 import logging
 import configparser
+import tempfile
+import subprocess
+import webbrowser
+import platform
 from pathlib import Path
 
 # 三方库
@@ -19,6 +23,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from qt_material import apply_stylesheet
+import requests
 
 # 自研库
 from utils import *
@@ -169,6 +174,18 @@ class TeslaCamPlayer(QMainWindow):
         notify_action.triggered.connect(self.open_notification_settings)
         settings_menu.addAction(notify_action)
 
+        # 帮助菜单
+        help_menu = menu_bar.addMenu("帮助")
+        check_update_action = QAction("检查更新", self)
+        check_update_action.triggered.connect(self.check_for_updates)
+        help_menu.addAction(check_update_action)
+
+        help_menu.addSeparator()
+
+        about_action = QAction("关于", self)
+        about_action.triggered.connect(self.show_about_dialog)
+        help_menu.addAction(about_action)
+
         # # 主题菜单
         # self.theme_menu = ThemeMenu(self.theme_manager, self)
         # menu_bar.addMenu(self.theme_menu)
@@ -315,6 +332,154 @@ class TeslaCamPlayer(QMainWindow):
     def open_notification_settings(self):
         dlg = NotificationSettingsDialog(self)
         dlg.exec_()
+
+    # ******************** 帮助菜单：关于 & 检查更新 ********************
+
+    def show_about_dialog(self):
+        """显示关于对话框"""
+        text = (
+            f"<b>{GlobalConfig.APP_NAME}</b><br>"
+            f"版本：{GlobalConfig.APP_VERSION}<br><br>"
+            "TeslaCam Player 是一个针对 TeslaCam / Sentry Mode 视频的桌面播放器与管理工具，"
+            "支持浏览、预览、合成导出以及主题切换等功能。"
+        )
+        QMessageBox.about(self, "关于 TeslaCam Player", text)
+
+    def _parse_version(self, version_str: str) -> tuple:
+        """将版本号字符串解析为可比较的元组，仅提取 x.y.z 三段数字。"""
+        # 例如："1.0.5 Build 2025.12.11.01" -> (1, 0, 5)
+        main_part = version_str.split()[0]
+        parts = []
+        for p in main_part.split('.'):
+            try:
+                parts.append(int(p))
+            except ValueError:
+                parts.append(0)
+        while len(parts) < 3:
+            parts.append(0)
+        return tuple(parts[:3])
+
+    def _select_asset_for_current_os(self, assets):
+        """根据当前操作系统选择合适的安装包 asset。"""
+        if not assets:
+            return None
+
+        if sys.platform.startswith("win"):
+            # Windows: NSIS 安装包
+            for a in assets:
+                name = a.get("name", "")
+                if name.endswith("_Setup.exe"):
+                    return a
+        elif sys.platform == "darwin":
+            # macOS: 根据架构选择 DMG
+            arch = platform.machine().lower()
+            preferred_suffix = "ARM64" if "arm" in arch else "X64"
+            candidates = []
+            for a in assets:
+                name = a.get("name", "")
+                if name.endswith(".dmg") and "TeslaCamPlayer-macOS-" in name:
+                    candidates.append(a)
+                    if preferred_suffix in name:
+                        return a
+            if candidates:
+                return candidates[0]
+
+        return None
+
+    def check_for_updates(self):
+        """检查 GitHub 是否有新版本发布，并根据用户确认下载并启动安装程序。"""
+        repo = "JerryYu2014/TeslaCamPlayer"
+        api_url = f"https://api.github.com/repos/{repo}/releases/latest"
+
+        try:
+            resp = requests.get(api_url, timeout=10)
+            resp.raise_for_status()
+            data = resp.json()
+        except Exception as ex:
+            QMessageBox.warning(self, "检查更新失败",
+                                f"请求 GitHub 最新版本信息失败：{ex}")
+            return
+
+        latest_tag = data.get("tag_name") or ""
+        latest_name = data.get("name") or latest_tag
+
+        # 从 tag_name 中提取主版本号，形如 v1.0.5-2025... -> 1.0.5
+        tag_version_str = latest_tag.lstrip('v').split(
+            '-')[0] if latest_tag else "0.0.0"
+        current_version = self._parse_version(GlobalConfig.APP_VERSION)
+        latest_version = self._parse_version(tag_version_str)
+
+        if latest_version <= current_version:
+            QMessageBox.information(
+                self,
+                "检查更新",
+                f"当前已是最新版本：{GlobalConfig.APP_VERSION}\n最新发布：{latest_name}",
+            )
+            return
+
+        # 发现新版本
+        reply = QMessageBox.question(
+            self,
+            "发现新版本",
+            f"检测到新版本：{latest_name}\n当前版本：{GlobalConfig.APP_VERSION}\n\n是否现在下载并安装？",
+            QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.Yes,
+        )
+
+        if reply != QMessageBox.Yes:
+            return
+
+        asset = self._select_asset_for_current_os(data.get("assets", []))
+        if not asset:
+            QMessageBox.warning(
+                self,
+                "无法下载",
+                "未找到与当前操作系统匹配的安装包，请前往 GitHub Releases 页面手动下载。",
+            )
+            # 打开 Releases 页面
+            webbrowser.open(f"https://github.com/{repo}/releases")
+            return
+
+        url = asset.get("browser_download_url")
+        name = asset.get("name", "installer")
+
+        # 下载文件
+        try:
+            tmp_dir = tempfile.gettempdir()
+            download_path = os.path.join(tmp_dir, name)
+
+            with requests.get(url, stream=True, timeout=60) as r:
+                r.raise_for_status()
+                with open(download_path, "wb") as f:
+                    for chunk in r.iter_content(chunk_size=8192):
+                        if chunk:
+                            f.write(chunk)
+        except Exception as ex:
+            QMessageBox.warning(self, "下载失败", f"安装包下载失败：{ex}")
+            return
+
+        # 启动安装程序
+        try:
+            if sys.platform.startswith("win"):
+                subprocess.Popen([download_path], shell=True)
+            elif sys.platform == "darwin":
+                subprocess.Popen(["open", download_path])
+            else:
+                QMessageBox.information(
+                    self,
+                    "安装提示",
+                    f"已下载安装包：{download_path}\n请手动运行完成安装。",
+                )
+                return
+
+            QMessageBox.information(
+                self,
+                "安装程序已启动",
+                "安装程序已启动，请按照向导完成升级。应用将现在退出。",
+            )
+            QApplication.instance().quit()
+        except Exception as ex:
+            QMessageBox.warning(self, "安装启动失败", f"无法启动安装程序：{ex}")
 
     def resizeEvent(self, event):
         # 获取屏幕分辨率

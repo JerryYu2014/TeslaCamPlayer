@@ -1,6 +1,8 @@
 # TeslaCamPlayer
 
-[![CI Status](https://github.com/JerryYu2014/TeslaCamPlayer/actions/workflows/ci.yml/badge.svg)](https://github.com/JerryYu2014/TeslaCamPlayer/actions/workflows/ci.yml)
+[![A.CI](https://github.com/JerryYu2014/TeslaCamPlayer/actions/workflows/ci.yml/badge.svg)](https://github.com/JerryYu2014/TeslaCamPlayer/actions/workflows/ci.yml)
+[![B.Create Release Tag](https://github.com/JerryYu2014/TeslaCamPlayer/actions/workflows/create-release-tag.yml/badge.svg)](https://github.com/JerryYu2014/TeslaCamPlayer/actions/workflows/create-release-tag.yml)
+[![C.Build and Release](https://github.com/JerryYu2014/TeslaCamPlayer/actions/workflows/release.yml/badge.svg)](https://github.com/JerryYu2014/TeslaCamPlayer/actions/workflows/release.yml)
 
 TeslaCamPlayer 是一个针对特斯拉行车记录仪（TeslaCam / Sentry Mode）视频文件的桌面播放器与管理工具，基于 Python 与 PyQt5 构建，提供跨平台的图形界面，方便地浏览、预览和导出 TeslaCam 片段。
 

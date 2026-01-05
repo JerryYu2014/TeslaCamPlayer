@@ -1,6 +1,8 @@
 # TeslaCamPlayer
 
-[![CI Status](https://github.com/JerryYu2014/TeslaCamPlayer/actions/workflows/ci.yml/badge.svg)](https://github.com/JerryYu2014/TeslaCamPlayer/actions/workflows/ci.yml)
+[![A.CI](https://github.com/JerryYu2014/TeslaCamPlayer/actions/workflows/ci.yml/badge.svg)](https://github.com/JerryYu2014/TeslaCamPlayer/actions/workflows/ci.yml)
+[![B.Create Release Tag](https://github.com/JerryYu2014/TeslaCamPlayer/actions/workflows/create-release-tag.yml/badge.svg)](https://github.com/JerryYu2014/TeslaCamPlayer/actions/workflows/create-release-tag.yml)
+[![C.Build and Release](https://github.com/JerryYu2014/TeslaCamPlayer/actions/workflows/release.yml/badge.svg)](https://github.com/JerryYu2014/TeslaCamPlayer/actions/workflows/release.yml)
 
 TeslaCamPlayer is a desktop player and manager for Tesla dashcam (TeslaCam / Sentry Mode) video files. 
 It is built with Python and PyQt5, providing a cross‑platform GUI to quickly browse, preview, and export TeslaCam clips.
