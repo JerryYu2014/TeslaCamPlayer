@@ -1,8 +1,6 @@
-## TeslaCam Player
+## 用一款顺手的桌面工具，重新发掘 TeslaCam 的价值
 
 GitHub 开源地址：https://github.com/JerryYu2014/TeslaCamPlayer
-
-## 用一款顺手的桌面工具，重新发掘 TeslaCam 的价值
 
 很多 Tesla 车主第一次打开 U 盘里的 `TeslaCam` 文件夹时，都会有类似的感受：
 
@@ -126,6 +124,7 @@ TeslaCam Player 集成了 GitHub Releases 的更新检查：
 TeslaCam Player 的发布、安装与更新流程都是围绕 GitHub 完成的：
 
 - **Windows**：
+
   - 通过 GitHub Releases 下载 NSIS 安装包（`TeslaCamPlayer_x.y.z_Setup.exe`）；
   - 双击安装后，即可在开始菜单中找到“TeslaCam Player”。
 

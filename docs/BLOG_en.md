@@ -1,8 +1,6 @@
-## TeslaCam Player
+## Rediscover the Value of TeslaCam with a Desktop Tool That Actually Fits Your Workflow
 
 GitHub repository: https://github.com/JerryYu2014/TeslaCamPlayer
-
-## Rediscover the Value of TeslaCam with a Desktop Tool That Actually Fits Your Workflow
 
 The first time many Tesla owners open the `TeslaCam` folder on their USB drive, the reaction is usually the same:
 
@@ -141,6 +139,7 @@ TeslaCam Player helps you:
 TeslaCam Player is distributed via GitHub Releases.
 
 - **On Windows**
+
   - Download the NSIS installer (`TeslaCamPlayer_x.y.z_Setup.exe`) from the Releases page.
   - Run the installer and launch TeslaCam Player from the Start menu.
 
