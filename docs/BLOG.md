@@ -1,4 +1,4 @@
-## 用一款顺手的桌面工具，重新发掘 TeslaCam 的价值
+## 基于 Python 与 PyQt5 构建的特斯拉行车记录仪视频播放器
 
 GitHub 开源地址：https://github.com/JerryYu2014/TeslaCamPlayer
 

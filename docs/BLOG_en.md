@@ -1,4 +1,4 @@
-## Rediscover the Value of TeslaCam with a Desktop Tool That Actually Fits Your Workflow
+## Tesla dashcam video player built on Python and PyQt5
 
 GitHub repository: https://github.com/JerryYu2014/TeslaCamPlayer
 
