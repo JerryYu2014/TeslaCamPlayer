@@ -2,26 +2,71 @@
 
 """Simple i18n helper for TeslaCamPlayer.
 
-- Default language follows system locale (zh-CN -> zh, others -> en).
-- Language can be overridden by config.ini: [Settings] language = zh / en.
+- Default language follows system locale.
+- Language can be overridden by config.ini: [Settings] language = zh / en /
+  zh-Hans / zh-Hant / ja.
+- Translations are primarily loaded from JSON files under assets/locales,
+  with a small in-module legacy dictionary kept as a fallback.
 """
 
 import configparser
+import json
 import locale
 import os
 
 import GlobalConfig
 
 
-_SUPPORTED_LANGS = ("zh", "en")
-_DEFAULT_LANG = "zh"
+LOCALES_DIR = os.path.join(os.path.dirname(__file__), "assets", "locales")
+
+# Canonical language codes for the app
+_SUPPORTED_LANGS = ("zh-Hans", "zh-Hant", "ja", "en")
+_DEFAULT_LANG = "zh-Hans"
+
+# Legacy in-code dict only contains zh/en; other languages will fall back to en
+_LEGACY_LANG_FALLBACK = "en"
+
+_translations_cache = {}
+
+
+def _normalize_lang(lang):
+    """Normalize various language codes / aliases to canonical ones.
+
+    Accepts historical values like "zh" / "en" and maps them to
+    "zh-Hans" / "en" etc.
+    """
+
+    if not lang:
+        return None
+    lang = lang.strip()
+    low = lang.lower()
+
+    # Historical short codes
+    if low in {"zh", "zh-cn", "zh_cn"}:
+        return "zh-Hans"
+    if low in {"zh-tw", "zh_hk", "zh-hk"}:
+        return "zh-Hant"
+    if low in {"en", "en-us", "en_us", "en-gb", "en_gb"}:
+        return "en"
+    if low in {"ja", "ja-jp", "ja_jp"}:
+        return "ja"
+
+    # Already a canonical or unknown code
+    if lang in _SUPPORTED_LANGS:
+        return lang
+
+    return None
 
 
 def _detect_system_lang():
     loc = locale.getdefaultlocale()[0] or ""
     loc = loc.lower()
     if "zh" in loc:
-        return "zh"
+        if "tw" in loc or "hk" in loc:
+            return "zh-Hant"
+        return "zh-Hans"
+    if "ja" in loc:
+        return "ja"
     return "en"
 
 
@@ -36,13 +81,15 @@ def _read_config_lang():
         return None
     if not cfg.has_section("Settings"):
         return None
-    lang = cfg.get("Settings", "language", fallback="").strip()
+    raw_lang = cfg.get("Settings", "language", fallback="").strip()
+    lang = _normalize_lang(raw_lang)
     if lang in _SUPPORTED_LANGS:
         return lang
     return None
 
 
 def _write_config_lang(lang):
+    lang = _normalize_lang(lang)
     if lang not in _SUPPORTED_LANGS:
         return
     cfg_path = GlobalConfig.CONFIG_FILE_PATH
@@ -68,10 +115,41 @@ def get_current_language():
 
 def set_language(lang):
     global _current_lang
-    if lang not in _SUPPORTED_LANGS:
+    normalized = _normalize_lang(lang)
+    if normalized not in _SUPPORTED_LANGS:
         return
-    _current_lang = lang
-    _write_config_lang(lang)
+    _current_lang = normalized
+    _write_config_lang(normalized)
+
+
+def _load_translations(lang):
+    """Load translations for given language from JSON with simple caching.
+
+    If the JSON file is missing or invalid, returns an empty dict. This
+    function never raises.
+    """
+
+    if lang not in _SUPPORTED_LANGS:
+        lang = _DEFAULT_LANG
+
+    if lang in _translations_cache:
+        return _translations_cache[lang]
+
+    data = {}
+    try:
+        filename = f"{lang}.json"
+        path = os.path.join(LOCALES_DIR, filename)
+        if os.path.exists(path):
+            with open(path, "r", encoding="utf-8") as f:
+                loaded = json.load(f)
+                if isinstance(loaded, dict):
+                    data = loaded
+    except Exception:
+        # Silently ignore locale file errors and fall back to legacy dict
+        data = {}
+
+    _translations_cache[lang] = data
+    return data
 
 
 _TEXTS = {
@@ -86,7 +164,13 @@ _TEXTS = {
     "menu.settings": {"zh": "设置", "en": "Settings"},
     "menu.settings.notify": {"zh": "通知设置", "en": "Notification Settings"},
     "menu.settings.language": {"zh": "语言", "en": "Language"},
-    "menu.settings.language.zh": {"zh": "中文", "en": "Chinese"},
+    # Language options (used in Settings → Language menu)
+    "menu.settings.language.zh": {"zh": "简体中文", "en": "Chinese (Simplified)"},
+    "menu.settings.language.zh_hant": {
+        "zh": "繁體中文",
+        "en": "Chinese (Traditional)",
+    },
+    "menu.settings.language.ja": {"zh": "日文", "en": "Japanese"},
     "menu.settings.language.en": {"zh": "英文", "en": "English"},
     "menu.help": {"zh": "帮助", "en": "Help"},
     "menu.help.check_update": {"zh": "检查更新", "en": "Check for Updates"},
@@ -304,11 +388,36 @@ _TEXTS = {
 
 
 def tr(key, **kwargs):
+    """Translate a key using current language.
+
+    The resolution order is:
+    1. JSON locale file for the current language (primary source).
+    2. Legacy in-module `_TEXTS` dictionary, using zh/en entries.
+    3. Fallback to the key itself.
+    """
+
     lang = _current_lang if _current_lang in _SUPPORTED_LANGS else _DEFAULT_LANG
-    entry = _TEXTS.get(key)
-    if not entry:
-        return key
-    text = entry.get(lang) or entry.get(_DEFAULT_LANG) or key
+
+    # 1) JSON-based translations
+    translations = _load_translations(lang)
+    text = translations.get(key)
+
+    # 2) Legacy in-code dictionary as a fallback (zh/en only)
+    if not text:
+        entry = _TEXTS.get(key)
+        if entry:
+            # Map canonical lang to legacy zh/en keys
+            if lang == "zh-Hans":
+                legacy_lang = "zh"
+            elif lang == "en":
+                legacy_lang = "en"
+            else:
+                legacy_lang = _LEGACY_LANG_FALLBACK
+            text = entry.get(legacy_lang) or entry.get(_LEGACY_LANG_FALLBACK)
+
+    if not text:
+        text = key
+
     if kwargs:
         try:
             return text.format(**kwargs)

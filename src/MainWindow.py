@@ -178,22 +178,51 @@ class TeslaCamPlayer(QMainWindow):
 
         # 语言子菜单
         language_menu = settings_menu.addMenu(tr("menu.settings.language"))
-        self.action_lang_zh = QAction(
-            tr("menu.settings.language.zh"), self, checkable=True)
+
+        # 简体中文
+        self.action_lang_zh_hans = QAction(
+            tr("menu.settings.language.zh"), self, checkable=True
+        )
+        # 繁體中文
+        self.action_lang_zh_hant = QAction(
+            tr("menu.settings.language.zh_hant"), self, checkable=True
+        )
+        # 日文
+        self.action_lang_ja = QAction(
+            tr("menu.settings.language.ja"), self, checkable=True
+        )
+        # 英文
         self.action_lang_en = QAction(
-            tr("menu.settings.language.en"), self, checkable=True)
+            tr("menu.settings.language.en"), self, checkable=True
+        )
 
         current_lang = get_current_language()
-        if current_lang == "zh":
-            self.action_lang_zh.setChecked(True)
+        # 兼容旧值 zh / en，I18n 会归一化
+        if current_lang in ("zh", "zh-Hans"):
+            self.action_lang_zh_hans.setChecked(True)
+        elif current_lang in ("zh-Hant", "zh-tw", "zh_hk", "zh-hk"):
+            self.action_lang_zh_hant.setChecked(True)
+        elif current_lang in ("ja", "ja-jp", "ja_jp"):
+            self.action_lang_ja.setChecked(True)
         else:
             self.action_lang_en.setChecked(True)
 
-        self.action_lang_zh.triggered.connect(
-            lambda: self.change_language("zh"))
+        self.action_lang_zh_hans.triggered.connect(
+            lambda: self.change_language("zh-Hans")
+        )
+        self.action_lang_zh_hant.triggered.connect(
+            lambda: self.change_language("zh-Hant")
+        )
+        self.action_lang_ja.triggered.connect(
+            lambda: self.change_language("ja")
+        )
         self.action_lang_en.triggered.connect(
-            lambda: self.change_language("en"))
-        language_menu.addAction(self.action_lang_zh)
+            lambda: self.change_language("en")
+        )
+
+        language_menu.addAction(self.action_lang_zh_hans)
+        language_menu.addAction(self.action_lang_zh_hant)
+        language_menu.addAction(self.action_lang_ja)
         language_menu.addAction(self.action_lang_en)
 
         # 帮助菜单
@@ -378,12 +407,23 @@ class TeslaCamPlayer(QMainWindow):
         # 更新当前语言并写入配置文件
         set_language(lang)
 
-        # 更新菜单勾选状态
-        if lang == "zh":
-            self.action_lang_zh.setChecked(True)
-            self.action_lang_en.setChecked(False)
+        # 先全部清空勾选状态
+        for action in [
+            self.action_lang_zh_hans,
+            self.action_lang_zh_hant,
+            self.action_lang_ja,
+            self.action_lang_en,
+        ]:
+            action.setChecked(False)
+
+        # 根据选择的语言重新勾选
+        if lang in ("zh", "zh-Hans"):
+            self.action_lang_zh_hans.setChecked(True)
+        elif lang in ("zh-Hant", "zh-tw", "zh_hk", "zh-hk"):
+            self.action_lang_zh_hant.setChecked(True)
+        elif lang in ("ja", "ja-jp", "ja_jp"):
+            self.action_lang_ja.setChecked(True)
         else:
-            self.action_lang_zh.setChecked(False)
             self.action_lang_en.setChecked(True)
 
         # 提示需要重启
