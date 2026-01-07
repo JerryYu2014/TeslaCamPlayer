@@ -18,11 +18,13 @@ It is built with Python and PyQt5, providing a cross‑platform GUI to quickly b
 - **Multi‑view playback**  
   Use `python-vlc` and `ffmpeg-python` under the hood to support multiple video streams and timeline control.
 - **Clip export & merge**  
-  Export selected time ranges to standalone video files, with basic merging capabilities (powered by FFmpeg).
-- **Modern desktop UI**  
-  PyQt5 + qt-material + QtAwesome provide a Material‑style, modern desktop interface.
-- **System notifications**  
-  On Windows, `win11toast` is used to display system‑level notifications.
+  Export selected time ranges as a single merged video via the dedicated "Merge & Export" dialog, making it easy to submit evidence to insurers / police or share with friends.
+- **Modern desktop UI with multi‑language support**  
+  PyQt5 + qt-material + QtAwesome provide a Material‑style, modern desktop interface; the app ships with both Chinese and English UIs, auto‑detects system language by default, and allows manual switching under "Settings → Language" with the selection persisted in the config file.
+- **Notification settings**  
+  Supports configurable notification channels, including system notifications, email, and WeCom (WeChat Work) bots for important events such as export completion. On Windows, this can be combined with `win11toast` for native toast notifications.
+- **Built‑in update check & download dialog**  
+  "Help → Check for Updates" talks to the GitHub Releases API. When a new version is available, a separate non‑blocking download dialog shows real‑time progress, the download URL (with a **Copy** button), the local save path (with an **Open Folder** button), and a dedicated HTTP proxy setting used only for update downloads.
 
 > The actual feature set depends on the released version. See `MainWindow.py` and `TeslaCamPlayerWidget.py` for the main entry points and UI logic.
 
@@ -44,8 +46,8 @@ It is built with Python and PyQt5, providing a cross‑platform GUI to quickly b
   - requests (network requests, e.g. for checking updates or downloading resources)
 - **Packaging & distribution**  
   - PyInstaller (`pyinstaller`)
-  - Windows installer: NSIS
-  - macOS installer: Packages (pkg)
+  - Windows installer: NSIS (EXE installer)
+  - macOS: PyInstaller‑built app bundled into DMG images
 
 See `requirements.txt` for the full list of dependencies.
 
@@ -70,7 +72,6 @@ TeslaCamPlayer/
 ├─ requirements.txt
 ├─ TeslaCamPlayer.spec           # PyInstaller spec file
 ├─ TeslaCamPlayer.nsi            # NSIS script (Windows)
-├─ TeslaCamPlayer.pkgproj        # Packages project (macOS)
 └─ README.md / README-en_US.md
 ```
 
@@ -245,10 +246,9 @@ End users can simply download the DMG that matches their Mac architecture from t
 - Install [NSIS](https://nsis.sourceforge.io/Main_Page).
 - Use the `TeslaCamPlayer.nsi` script in this repository to generate a Windows installer.
 
-#### macOS: pkg installer
+#### macOS
 
-- Install [Packages](http://s.sudre.free.fr/Software/Packages/about.html).
-- Open the `TeslaCamPlayer.pkgproj` project and build a pkg installer.
+For macOS, the recommended distribution format in CI is DMG (one for Intel and one for Apple Silicon) as described above. If you prefer other packaging formats (such as pkg), you can build them on top of the PyInstaller‑generated app bundle according to your own deployment requirements.
 
 ---
 
