@@ -21,6 +21,7 @@ from PyQt5.QtGui import *
 
 # from utils import *
 import GlobalConfig
+from I18n import tr
 from CamClipCombiner.CoreWorker import CoreWorker
 from Signal import Signal
 from notifier import Notifier
@@ -71,7 +72,7 @@ class CamClipCombiner(QDialog):
         """Set up the user interface, signals & slots"""
 
         # 设置窗体标题
-        self.setWindowTitle("合成导出")
+        self.setWindowTitle(tr("combiner.title"))
         # 设置窗体大小
         self.resize(900, 360)
         # 设置窗体居中
@@ -84,11 +85,11 @@ class CamClipCombiner(QDialog):
 
         # 输入视频
         inputFolderHLayout = QHBoxLayout()
-        inputFolderLbl = QLabel("输入视频", self)
+        inputFolderLbl = QLabel(tr("combiner.input_video"), self)
         inputFolderHLayout.addWidget(inputFolderLbl)
         self.inputFolder = QLineEdit(self)
-        self.inputFolder.setPlaceholderText("输入视频")
-        self.inputFolder.setToolTip("输入视频文件夹路径")
+        self.inputFolder.setPlaceholderText(tr("combiner.input_video.placeholder"))
+        self.inputFolder.setToolTip(tr("combiner.input_video.tooltip"))
         # 使用主窗体传入的文件夹路径
         if self.input_folder_path_from_main and os.path.exists(self.input_folder_path_from_main):
             self.inputFolder.setText(self.input_folder_path_from_main)
@@ -98,7 +99,7 @@ class CamClipCombiner(QDialog):
         self.inputFolder.setReadOnly(True)
         inputFolderHLayout.addWidget(self.inputFolder)
         # 打开文件夹按钮
-        self.openInputFolderBtn = QPushButton("打开文件夹", self)
+        self.openInputFolderBtn = QPushButton(tr("combiner.open_folder"), self)
         self.openInputFolderBtn.clicked.connect(self.openInputPath)
         inputFolderHLayout.addWidget(self.openInputFolderBtn)
         # # 播放按钮
@@ -109,17 +110,17 @@ class CamClipCombiner(QDialog):
 
         # 输入音频
         audioFilePathHLayout = QHBoxLayout()
-        audioFileLbl = QLabel("输入音频", self)
+        audioFileLbl = QLabel(tr("combiner.input_audio"), self)
         audioFilePathHLayout.addWidget(audioFileLbl)
         self.audioFilePath = QLineEdit(self)
-        self.audioFilePath.setPlaceholderText("输入音频")
-        self.audioFilePath.setToolTip("输入音频文件路径")
+        self.audioFilePath.setPlaceholderText(tr("combiner.input_audio.placeholder"))
+        self.audioFilePath.setToolTip(tr("combiner.input_audio.tooltip"))
         self.audioFilePath.setText(GlobalConfig.TEMPS_DIR)
         # 设置只读
         self.audioFilePath.setReadOnly(True)
         audioFilePathHLayout.addWidget(self.audioFilePath)
         # 添加浏览文件夹按钮
-        self.audioFileBrowseBtn = QPushButton("浏览...", self)
+        self.audioFileBrowseBtn = QPushButton(tr("combiner.browse"), self)
         self.audioFileBrowseBtn.clicked.connect(self.openAudioFile)
         audioFilePathHLayout.addWidget(self.audioFileBrowseBtn)
         # 打开文件夹按钮
@@ -130,44 +131,44 @@ class CamClipCombiner(QDialog):
 
         # 输出视频
         outputFolderHLayout = QHBoxLayout()
-        outputFolderLbl = QLabel("输出视频", self)
+        outputFolderLbl = QLabel(tr("combiner.output_video"), self)
         outputFolderHLayout.addWidget(outputFolderLbl)
         self.outputFolder = QLineEdit(self)
-        self.outputFolder.setPlaceholderText("输出视频")
-        self.outputFolder.setToolTip("输出视频文件夹路径")
+        self.outputFolder.setPlaceholderText(tr("combiner.output_video.placeholder"))
+        self.outputFolder.setToolTip(tr("combiner.output_video.tooltip"))
         self.outputFolder.setText(GlobalConfig.TEMPS_DIR)
         # 设置只读
         self.outputFolder.setReadOnly(True)
         outputFolderHLayout.addWidget(self.outputFolder)
         # 添加浏览文件夹按钮
-        self.outputBrowseBtn = QPushButton("浏览...", self)
+        self.outputBrowseBtn = QPushButton(tr("combiner.browse"), self)
         self.outputBrowseBtn.clicked.connect(
             lambda: self.browseFolder("outputType"))
         outputFolderHLayout.addWidget(self.outputBrowseBtn)
         # 打开文件夹按钮
-        self.openOutputFolderBtn = QPushButton("打开文件夹", self)
+        self.openOutputFolderBtn = QPushButton(tr("combiner.open_folder"), self)
         self.openOutputFolderBtn.clicked.connect(self.openOutputPath)
         outputFolderHLayout.addWidget(self.openOutputFolderBtn)
         self.vBox.addLayout(outputFolderHLayout)
 
         # FFmpeg路径
         ffmpegPathHLayout = QHBoxLayout()
-        ffmpegPathLbl = QLabel("FFmpeg", self)
+        ffmpegPathLbl = QLabel(tr("combiner.ffmpeg"), self)
         ffmpegPathHLayout.addWidget(ffmpegPathLbl)
         self.ffmpegPath = QLineEdit(self)
-        self.ffmpegPath.setPlaceholderText("FFmpeg安装路径(安装路径将被添加到工作环境变量PATH中)")
-        self.ffmpegPath.setToolTip("FFmpeg安装路径(安装路径将被添加到工作环境变量PATH中)")
+        self.ffmpegPath.setPlaceholderText(tr("combiner.ffmpeg.placeholder"))
+        self.ffmpegPath.setToolTip(tr("combiner.ffmpeg.tooltip"))
         self.ffmpegPath.textChanged.connect(self.ffmpegPathChanged)
         self.ffmpegPath.setReadOnly(True)
         ffmpegPathHLayout.addWidget(self.ffmpegPath)
         # 添加浏览文件夹按钮
-        self.ffmpegBrowseBtn = QPushButton("浏览...", self)
+        self.ffmpegBrowseBtn = QPushButton(tr("combiner.browse"), self)
         self.ffmpegBrowseBtn.clicked.connect(
             lambda: self.browseFolder("ffmpegType"))
         ffmpegPathHLayout.addWidget(self.ffmpegBrowseBtn)
         # 重置
-        self.resetFFmpegPathBtn = QPushButton("重置", self)
-        self.resetFFmpegPathBtn.setToolTip("重置为初始默认路径")
+        self.resetFFmpegPathBtn = QPushButton(tr("combiner.ffmpeg.reset"), self)
+        self.resetFFmpegPathBtn.setToolTip(tr("combiner.ffmpeg.reset.tooltip"))
         self.resetFFmpegPathBtn.clicked.connect(self.resetFFmpegPath)
         ffmpegPathHLayout.addWidget(self.resetFFmpegPathBtn)
         self.vBox.addLayout(ffmpegPathHLayout)
@@ -175,21 +176,21 @@ class CamClipCombiner(QDialog):
         # 其他配置
         othersHLayout = QHBoxLayout()
         # 输出倍速
-        tripleSpeedLbl = QLabel("输出倍速", self)
+        tripleSpeedLbl = QLabel(tr("combiner.speed"), self)
         othersHLayout.addWidget(tripleSpeedLbl)
         self.tripleSpeed = QDoubleSpinBox(self)
-        self.tripleSpeed.setToolTip("输出视频播放倍速")
+        self.tripleSpeed.setToolTip(tr("combiner.speed.tooltip"))
         self.tripleSpeed.setRange(0.1, 10)
         self.tripleSpeed.setValue(10)
         self.tripleSpeed.setSingleStep(0.1)
         self.tripleSpeed.valueChanged.connect(self.tripleSpeedChanged)
         othersHLayout.addWidget(self.tripleSpeed)
         # 高德地图 API Key
-        amapApiKeyLbl = QLabel("高德地图 API Key", self)
+        amapApiKeyLbl = QLabel(tr("combiner.amap.label"), self)
         othersHLayout.addWidget(amapApiKeyLbl)
         self.amapApiKey = QLineEdit(self)
-        self.amapApiKey.setPlaceholderText("输入高德地图 API Key")
-        self.amapApiKey.setToolTip("高德地图 API Key, 用于通过经纬度获取地址, 将地址添加到视频中")
+        self.amapApiKey.setPlaceholderText(tr("combiner.amap.placeholder"))
+        self.amapApiKey.setToolTip(tr("combiner.amap.tooltip"))
         self.amapApiKey.setMaxLength(32)
         self.amapApiKey.setMinimumWidth(260)
         # 只允许字母和数字
@@ -197,14 +198,19 @@ class CamClipCombiner(QDialog):
         self.amapApiKey.textChanged.connect(self.amapApiKeyChanged)
         othersHLayout.addWidget(self.amapApiKey)
         # 主视角
-        mainViewLbl = QLabel("主视角", self)
+        mainViewLbl = QLabel(tr("combiner.main_view"), self)
         othersHLayout.addWidget(mainViewLbl)
         self.mainViewBox = QComboBox()
-        self.mainViewBox.setPlaceholderText("主视角")
-        self.mainViewBox.setToolTip("主视角")
-        self.mainViewBox.addItems(["前", "后", "左", "右"])
+        self.mainViewBox.setPlaceholderText(tr("combiner.main_view.placeholder"))
+        self.mainViewBox.setToolTip(tr("combiner.main_view.tooltip"))
+        self.mainViewBox.addItems([
+            tr("player.view.front"),
+            tr("player.view.back"),
+            tr("player.view.left"),
+            tr("player.view.right"),
+        ])
         self.mainViewBox.setMinimumWidth(100)
-        self.mainViewBox.setCurrentText("前")
+        self.mainViewBox.setCurrentText(tr("player.view.front"))
         self.mainViewBox.currentTextChanged.connect(
             lambda text: self.setMainView(text))
         othersHLayout.addWidget(self.mainViewBox)
@@ -213,7 +219,7 @@ class CamClipCombiner(QDialog):
 
         procProgHLayout = QHBoxLayout()
         # 处理进度条
-        procProgLbl = QLabel("处理进度", self)
+        procProgLbl = QLabel(tr("combiner.progress"), self)
         procProgHLayout.addWidget(procProgLbl)
         self.procProgBar = QProgressBar(self)
         self.procProgBar.setRange(0, 100)
@@ -229,7 +235,7 @@ class CamClipCombiner(QDialog):
         bottom_hlayout = QHBoxLayout()
         bottom_hlayout.addStretch(1)
         # 处理按钮
-        self.handlebtn = QPushButton("开始处理")
+        self.handlebtn = QPushButton(tr("combiner.start"))
         self.handlebtn.clicked.connect(self.startProcess)
         bottom_hlayout.addWidget(self.handlebtn)
         self.vBox.addLayout(bottom_hlayout)
@@ -254,7 +260,7 @@ class CamClipCombiner(QDialog):
         loading_layout = QVBoxLayout(self.loading_overlay)
         loading_layout.setAlignment(Qt.AlignCenter)
         # 提示文字
-        self.loading_label = QLabel('处理中，请稍候...')
+        self.loading_label = QLabel(tr("combiner.loading"))
         self.loading_label.setStyleSheet("""
             color: white;
             font-size: 18px;
@@ -263,7 +269,7 @@ class CamClipCombiner(QDialog):
         """)
         loading_layout.addWidget(self.loading_label)
         # 取消按钮
-        self.cancProcBtn = QPushButton("取消", self)
+        self.cancProcBtn = QPushButton(tr("button.cancel"), self)
         self.cancProcBtn.setStyleSheet("""
             color: white;
             font-size: 16px;
@@ -350,9 +356,15 @@ class CamClipCombiner(QDialog):
                 pass
             else:
                 QMessageBox.question(
-                    self, '提示',
-                    f'{folder} 路径下不存在 FFmpeg，将使用 {self.get_default_ffmpeg_path()} 路径下的 FFmpeg',
-                    QMessageBox.Yes)
+                    self,
+                    tr("dialog.tip.title"),
+                    tr(
+                        "combiner.ffmpeg.not_found",
+                        folder=folder,
+                        default=self.get_default_ffmpeg_path(),
+                    ),
+                    QMessageBox.Yes,
+                )
                 self.ffmpegPath.setText(self.get_default_ffmpeg_path())
                 self.save_config()
         elif platform.system() == "Windows":
@@ -360,9 +372,15 @@ class CamClipCombiner(QDialog):
                 pass
             else:
                 QMessageBox.question(
-                    self, '提示',
-                    f'{folder} 路径下不存在 FFmpeg，将使用 {self.get_default_ffmpeg_path()} 路径下的 FFmpeg',
-                    QMessageBox.Yes)
+                    self,
+                    tr("dialog.tip.title"),
+                    tr(
+                        "combiner.ffmpeg.not_found",
+                        folder=folder,
+                        default=self.get_default_ffmpeg_path(),
+                    ),
+                    QMessageBox.Yes,
+                )
                 self.ffmpegPath.setText(self.get_default_ffmpeg_path())
                 self.save_config()
 
@@ -373,10 +391,11 @@ class CamClipCombiner(QDialog):
         # 对话框中不显示状态栏，仅在日志中记录 FFmpeg 可用状态
         ffmpeg_path = shutil.which('ffmpeg')
         if ffmpeg_path:
-            ffmpegtips = 'FFmpeg 可用'
+            status = tr("combiner.status.ffmpeg_available")
         else:
-            ffmpegtips = 'FFmpeg 不可用'
-        ffmpegtips = f'{ffmpegtips}：{ffmpeg_path if ffmpeg_path else "FFmpeg 未安装或未在 PATH 环境变量中"}'
+            status = tr("combiner.status.ffmpeg_unavailable")
+        detail = ffmpeg_path if ffmpeg_path else "FFmpeg not installed or not in PATH"
+        ffmpegtips = tr("combiner.status.ffmpeg_detail", status=status, detail=detail)
         self.glogger.info(ffmpegtips)
 
     def addFFmpegEnvPath(self):
@@ -389,12 +408,13 @@ class CamClipCombiner(QDialog):
         # self.glogger.info(f"New PATH: {NewPATH}")
 
     def setMainView(self, zh_view):
-        view = {
-            '前': 'front',
-            '后': 'back',
-            '左': 'left',
-            '右': 'right'
-        }[zh_view]
+        view_map = {
+            tr("player.view.front"): 'front',
+            tr("player.view.back"): 'back',
+            tr("player.view.left"): 'left',
+            tr("player.view.right"): 'right',
+        }
+        view = view_map.get(zh_view, 'front')
         self.main_view = view
         self.save_config()
 
@@ -429,33 +449,37 @@ class CamClipCombiner(QDialog):
         if foldertype == "inputType":
             if self.inputFolder.text() != "" and os.path.exists(self.inputFolder.text()):
                 folder = QFileDialog.getExistingDirectory(
-                    self, "选择文件夹", self.inputFolder.text())
+                    self, tr("filedialog.select_folder"), self.inputFolder.text())
             else:
                 folder = QFileDialog.getExistingDirectory(
-                    self, "选择文件夹", os.path.expanduser('~'))
+                    self, tr("filedialog.select_folder"), os.path.expanduser('~'))
         elif foldertype == "outputType":
             if self.outputFolder.text() != "" and os.path.exists(self.outputFolder.text()):
                 folder = QFileDialog.getExistingDirectory(
-                    self, "选择文件夹", self.outputFolder.text())
+                    self, tr("filedialog.select_folder"), self.outputFolder.text())
             else:
                 folder = QFileDialog.getExistingDirectory(
                     self, "选择文件夹", os.path.expanduser('~'))
         elif foldertype == "ffmpegType":
             if self.ffmpegPath.text() != "" and os.path.exists(self.ffmpegPath.text()):
                 folder = QFileDialog.getExistingDirectory(
-                    self, "选择文件夹", self.ffmpegPath.text())
+                    self, tr("filedialog.select_folder"), self.ffmpegPath.text())
             else:
                 folder = QFileDialog.getExistingDirectory(
                     self, "选择文件夹", os.path.expanduser('~'))
         else:
             folder = QFileDialog.getExistingDirectory(
-                self, "选择文件夹", os.path.expanduser('~'))
+                self, tr("filedialog.select_folder"), os.path.expanduser('~'))
 
         if folder:
             if foldertype == "inputType":
                 if not self.is_tesla_cam_video_folder(folder):
                     QMessageBox.question(
-                        self, '提示', f'{folder} 路径下不存在符合特斯拉行车记录仪视频文件规范的文件', QMessageBox.Yes)
+                        self,
+                        tr("dialog.tip.title"),
+                        tr("combiner.ffmpeg.invalid_tesla_folder", folder=folder),
+                        QMessageBox.Yes,
+                    )
                 else:
                     self.inputFolder.setText(folder)
                     self.outputFolder.setText(os.path.join(folder, "temps"))
@@ -470,7 +494,11 @@ class CamClipCombiner(QDialog):
                         self.save_config()
                     else:
                         QMessageBox.question(
-                            self, '提示', f'{folder} 路径下不存在 FFmpeg', QMessageBox.Yes)
+                            self,
+                            tr("dialog.tip.title"),
+                            tr("combiner.ffmpeg.not_found", folder=folder, default=self.get_default_ffmpeg_path()),
+                            QMessageBox.Yes,
+                        )
                 elif platform.system() == "Windows":
                     if os.path.exists(os.path.join(folder, "ffmpeg.exe")):
                         self.ffmpegPath.setText(folder)
@@ -495,7 +523,11 @@ class CamClipCombiner(QDialog):
             self.save_config()
         else:
             QMessageBox.question(
-                self, '提示', '初始默认FFmpeg路径不存在', QMessageBox.Yes)
+                self,
+                tr("dialog.tip.title"),
+                tr("combiner.ffmpeg.default_missing"),
+                QMessageBox.Yes,
+            )
 
     def get_default_ffmpeg_path(self):
         # 设置初始默认路径（使用了 := 海象运算符和三元表达式来简化）
@@ -513,10 +545,18 @@ class CamClipCombiner(QDialog):
         if self.audioFilePath.text() != "" and os.path.exists(self.audioFilePath.text()):
             # 路径已设置并存在，则默认打开设置的路径
             filename = QFileDialog.getOpenFileName(
-                self, "选择 mp3音频文件", self.audioFilePath.text(), "MP3 Files (*.mp3)")
+                self,
+                tr("filedialog.select_mp3"),
+                self.audioFilePath.text(),
+                tr("filedialog.filter_mp3"),
+            )
         else:
             filename = QFileDialog.getOpenFileName(
-                self, "选择 mp3音频文件", os.path.expanduser('~'), "MP3 Files (*.mp3)")
+                self,
+                tr("filedialog.select_mp3"),
+                os.path.expanduser('~'),
+                tr("filedialog.filter_mp3"),
+            )
 
         if not filename or not filename[0]:
             return

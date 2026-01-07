@@ -216,11 +216,18 @@ class TeslaCamPlayer(QMainWindow):
 
         vlcTips = None
         if not self.teslaCamPlayerWidget.is_vlc_installed():
-            vlcTips = "VLC 不可用： VLC 未安装"  # TODO: 可后续 i18n
-            QMessageBox.warning(self, '警告', 'VLC 未安装',
-                                QMessageBox.Yes)  # TODO: 可后续 i18n
+            vlcTips = tr("vlc.status.unavailable")
+            QMessageBox.warning(
+                self,
+                tr("vlc.not_installed.title"),
+                tr("vlc.not_installed.text"),
+                QMessageBox.Yes,
+            )
         else:
-            vlcTips = f"VLC 可用，版本：{self.teslaCamPlayerWidget.get_libvlc_version()}"
+            vlcTips = tr(
+                "vlc.status.available",
+                version=self.teslaCamPlayerWidget.get_libvlc_version(),
+            )
 
         self.status_bar = self.statusBar()
         self.status_bar.showMessage(
@@ -230,13 +237,13 @@ class TeslaCamPlayer(QMainWindow):
         if foldertype == "inputType":
             if self.inputFolderPath != "" and os.path.exists(self.inputFolderPath):
                 folder = QFileDialog.getExistingDirectory(
-                    self, "选择文件夹", self.inputFolderPath)
+                    self, tr("filedialog.select_folder"), self.inputFolderPath)
             else:
                 folder = QFileDialog.getExistingDirectory(
-                    self, "选择文件夹", os.path.expanduser('~'))
+                    self, tr("filedialog.select_folder"), os.path.expanduser('~'))
         else:
             folder = QFileDialog.getExistingDirectory(
-                self, "选择文件夹", os.path.expanduser('~'))
+                self, tr("filedialog.select_folder"), os.path.expanduser('~'))
 
         if folder:
             if foldertype == "inputType":
@@ -271,14 +278,22 @@ class TeslaCamPlayer(QMainWindow):
         if message == "fail":
             self.loading_overlay.hide()
             QMessageBox.question(
-                self, '提示', '处理失败', QMessageBox.Yes)
+                self,
+                tr("dialog.tip.title"),
+                tr("process.fail"),
+                QMessageBox.Yes,
+            )
             return
 
         self.glogger.info(f"处理完成: {message}")
 
         self.loading_overlay.hide()
         QMessageBox.question(
-            self, '提示', '处理完成', QMessageBox.Yes)
+            self,
+            tr("dialog.tip.title"),
+            tr("process.done"),
+            QMessageBox.Yes,
+        )
 
     def folder_changed(self, folder_path):
         self.inputFolderPath = folder_path
@@ -375,7 +390,7 @@ class TeslaCamPlayer(QMainWindow):
         QMessageBox.information(
             self,
             tr("menu.settings.language"),
-            "语言设置已保存，请重新启动应用后生效。" if lang == "zh" else "Language setting has been saved. Please restart the application to apply it.",
+            tr("settings.language.saved"),
         )
 
     def show_about_dialog(self):

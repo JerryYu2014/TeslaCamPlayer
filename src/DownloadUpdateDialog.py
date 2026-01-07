@@ -191,8 +191,8 @@ class DownloadUpdateDialog(QDialog):
             else:
                 QMessageBox.information(
                     self,
-                    "安装提示",
-                    f"已下载安装包：{download_path}\n请手动运行完成安装。",
+                    tr("download.manual_install.title"),
+                    tr("download.manual_install.text", path=download_path),
                 )
                 # 其他平台仅关闭对话框即可
                 self.accept()
@@ -218,11 +218,11 @@ class DownloadUpdateDialog(QDialog):
     def _on_cancel(self):
         self._worker.cancel()
         self.cancel_button.setEnabled(False)
-        self.status_label.setText("正在取消，请稍候……")
+        self.status_label.setText(tr("download.cancel.in_progress"))
 
     def _on_cancelled(self):
         """工作线程确认已取消并清理完成后关闭对话框。"""
-        self.status_label.setText("已取消")
+        self.status_label.setText(tr("download.cancelled"))
         logging.getLogger(__name__).info(
             "Update download dialog: cancelled acknowledged by worker.")
         self.reject()

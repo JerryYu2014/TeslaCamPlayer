@@ -18,50 +18,51 @@ from PyQt5.QtWidgets import (
 )
 
 import GlobalConfig
+from I18n import tr
 
 
 class NotificationSettingsDialog(QDialog):
     def __init__(self, parent=None) -> None:
         super().__init__(parent)
 
-        self.setWindowTitle("通知设置")
+        self.setWindowTitle(tr("notify.title"))
         self.resize(480, 360)
 
         root = QVBoxLayout(self)
 
-        self.chkSystem = QCheckBox("系统通知", self)
+        self.chkSystem = QCheckBox(tr("notify.system"), self)
         root.addWidget(self.chkSystem)
 
         self.emailForm = QFormLayout()
         self.emailForm.setFieldGrowthPolicy(QFormLayout.ExpandingFieldsGrow)
 
         self.edHost = QLineEdit(self)
-        self.edHost.setPlaceholderText("SMTP服务器，如 smtp.qq.com")
+        self.edHost.setPlaceholderText(tr("notify.smtp.host.placeholder"))
         self.spinPort = QLineEdit(self)
-        self.spinPort.setPlaceholderText("端口，如 465 或 587")
+        self.spinPort.setPlaceholderText(tr("notify.smtp.port.placeholder"))
         self.edUser = QLineEdit(self)
         self.edPass = QLineEdit(self)
         self.edPass.setEchoMode(QLineEdit.Password)
         self.edFrom = QLineEdit(self)
         self.edTo = QLineEdit(self)
-        self.edTo.setPlaceholderText("多个收件人用逗号分隔")
-        self.chkSSL = QCheckBox("使用SSL", self)
-        self.chkTLS = QCheckBox("使用TLS", self)
+        self.edTo.setPlaceholderText(tr("notify.smtp.to.placeholder"))
+        self.chkSSL = QCheckBox(tr("notify.ssl"), self)
+        self.chkTLS = QCheckBox(tr("notify.tls"), self)
 
         for w in (self.edHost, self.spinPort, self.edUser, self.edPass, self.edFrom, self.edTo):
             sp = w.sizePolicy()
             sp.setHorizontalStretch(1)
             w.setSizePolicy(sp)
 
-        self.emailForm.addRow("SMTP 主机", self.edHost)
-        self.emailForm.addRow("SMTP 端口", self.spinPort)
-        self.emailForm.addRow("SMTP 用户", self.edUser)
-        self.emailForm.addRow("SMTP 密码/授权码", self.edPass)
-        self.emailForm.addRow("发件人 From", self.edFrom)
-        self.emailForm.addRow("收件人 To", self.edTo)
+        self.emailForm.addRow(tr("notify.smtp.host"), self.edHost)
+        self.emailForm.addRow(tr("notify.smtp.port"), self.spinPort)
+        self.emailForm.addRow(tr("notify.smtp.user"), self.edUser)
+        self.emailForm.addRow(tr("notify.smtp.pass"), self.edPass)
+        self.emailForm.addRow(tr("notify.smtp.from"), self.edFrom)
+        self.emailForm.addRow(tr("notify.smtp.to"), self.edTo)
         self.emailForm.addRow(self.chkSSL, self.chkTLS)
 
-        self.emailGroup = QGroupBox("邮件通知", self)
+        self.emailGroup = QGroupBox(tr("notify.group.email"), self)
         self.emailGroup.setCheckable(True)
         self.emailGroup.setLayout(self.emailForm)
         root.addWidget(self.emailGroup)
@@ -69,19 +70,23 @@ class NotificationSettingsDialog(QDialog):
         self.wechatForm = QFormLayout()
         self.wechatForm.setFieldGrowthPolicy(QFormLayout.ExpandingFieldsGrow)
         self.edWebhook = QLineEdit(self)
-        self.edWebhook.setPlaceholderText("企业微信机器人 Webhook URL")
+        self.edWebhook.setPlaceholderText(
+            tr("notify.wechat.webhook.placeholder"))
         self.edMentions = QLineEdit(self)
-        self.edMentions.setPlaceholderText("需要@的手机号，逗号分隔，可留空")
+        self.edMentions.setPlaceholderText(
+            tr("notify.wechat.mentions.placeholder"))
 
         for w in (self.edWebhook, self.edMentions):
             sp = w.sizePolicy()
             sp.setHorizontalStretch(1)
             w.setSizePolicy(sp)
 
-        self.wechatForm.addRow("Webhook", self.edWebhook)
-        self.wechatForm.addRow("@手机号", self.edMentions)
+        self.wechatForm.addRow(
+            tr("notify.wechat.webhook.label"), self.edWebhook)
+        self.wechatForm.addRow(
+            tr("notify.wechat.mentions.label"), self.edMentions)
 
-        self.wechatGroup = QGroupBox("微信通知", self)
+        self.wechatGroup = QGroupBox(tr("notify.group.wechat"), self)
         self.wechatGroup.setCheckable(True)
         self.wechatGroup.setLayout(self.wechatForm)
         root.addWidget(self.wechatGroup)
@@ -89,8 +94,8 @@ class NotificationSettingsDialog(QDialog):
         root.addStretch(1)
 
         btns = QHBoxLayout()
-        self.btnOk = QPushButton("确定", self)
-        self.btnCancel = QPushButton("取消", self)
+        self.btnOk = QPushButton(tr("button.ok"), self)
+        self.btnCancel = QPushButton(tr("button.cancel"), self)
         btns.addStretch(1)
         btns.addWidget(self.btnOk)
         btns.addWidget(self.btnCancel)
@@ -152,17 +157,20 @@ class NotificationSettingsDialog(QDialog):
         getboolean = config.getboolean
 
         try:
-            self.chkSystem.setChecked(getboolean(section, "notify_system", fallback=True))
+            self.chkSystem.setChecked(getboolean(
+                section, "notify_system", fallback=True))
         except Exception:
             self.chkSystem.setChecked(True)
 
         try:
-            self.emailGroup.setChecked(getboolean(section, "notify_email", fallback=False))
+            self.emailGroup.setChecked(getboolean(
+                section, "notify_email", fallback=False))
         except Exception:
             self.emailGroup.setChecked(False)
 
         try:
-            self.wechatGroup.setChecked(getboolean(section, "notify_wechat", fallback=False))
+            self.wechatGroup.setChecked(getboolean(
+                section, "notify_wechat", fallback=False))
         except Exception:
             self.wechatGroup.setChecked(False)
 
@@ -174,8 +182,10 @@ class NotificationSettingsDialog(QDialog):
         self.edFrom.setText(get(section, "smtp_from", fallback=""))
         self.edTo.setText(get(section, "smtp_to", fallback=""))
 
-        self.chkSSL.setChecked(config.getboolean(section, "use_ssl", fallback=False))
-        self.chkTLS.setChecked(config.getboolean(section, "use_tls", fallback=True))
+        self.chkSSL.setChecked(config.getboolean(
+            section, "use_ssl", fallback=False))
+        self.chkTLS.setChecked(config.getboolean(
+            section, "use_tls", fallback=True))
 
         self.edWebhook.setText(get(section, "wechat_webhook", fallback=""))
         self.edMentions.setText(get(section, "wechat_mentions", fallback=""))
@@ -195,12 +205,16 @@ class NotificationSettingsDialog(QDialog):
         email_vals = self.email_values()
         wechat_vals = self.wechat_values()
 
-        config.set(section, "notify_system", "1" if notify_vals["notify_system"] else "0")
-        config.set(section, "notify_email", "1" if notify_vals["notify_email"] else "0")
-        config.set(section, "notify_wechat", "1" if wechat_vals["enable_wechat"] else "0")
+        config.set(section, "notify_system",
+                   "1" if notify_vals["notify_system"] else "0")
+        config.set(section, "notify_email",
+                   "1" if notify_vals["notify_email"] else "0")
+        config.set(section, "notify_wechat",
+                   "1" if wechat_vals["enable_wechat"] else "0")
 
         config.set(section, "smtp_host", email_vals["smtp_host"] or "")
-        config.set(section, "smtp_port", "" if email_vals["smtp_port"] is None else str(email_vals["smtp_port"]))
+        config.set(section, "smtp_port", "" if email_vals["smtp_port"] is None else str(
+            email_vals["smtp_port"]))
         config.set(section, "smtp_user", email_vals["smtp_user"] or "")
         config.set(section, "smtp_pass", email_vals["smtp_pass"] or "")
         config.set(section, "smtp_from", email_vals["smtp_from"] or "")

@@ -13,6 +13,8 @@ from PyQt5.QtGui import *
 import qtawesome as qta
 import vlc
 
+from I18n import tr
+
 # 自研库
 # try:
 #     import GlobalConfig
@@ -61,14 +63,14 @@ class VideoContextMenu(QMenu):
     def setup_menu(self):
         """设置菜单项"""
         # 播放/暂停
-        self.play_pause_action = QAction("播放", self)
+        self.play_pause_action = QAction(tr("player.menu.play"), self)
         self.play_pause_action.triggered.connect(self.toggle_play_pause)
         # 设置统一的图标尺寸
         self.play_pause_action.setIcon(qta.icon('mdi.play', color='#1890ff'))
         self.addAction(self.play_pause_action)
 
         # 停止
-        stop_action = QAction("停止", self)
+        stop_action = QAction(tr("player.menu.stop"), self)
         stop_action.triggered.connect(self.parent_widget.stop_all)
         # 设置统一的图标尺寸
         stop_action.setIcon(qta.icon('mdi.stop', color='#1890ff'))
@@ -77,7 +79,7 @@ class VideoContextMenu(QMenu):
         self.addSeparator()
 
         # 播放倍数子菜单
-        speed_menu = self.addMenu("倍数")
+        speed_menu = self.addMenu(tr("player.menu.speed"))
         speed_menu.setIcon(qta.icon('mdi.speedometer', color='#1890ff'))
         speeds = [
             ("0.5x", 0.5),
@@ -102,9 +104,14 @@ class VideoContextMenu(QMenu):
         self.addSeparator()
 
         # 主视角切换子菜单
-        view_menu = self.addMenu("主视角")
+        view_menu = self.addMenu(tr("player.menu.view"))
         view_menu.setIcon(qta.icon('mdi.view-dashboard', color='#1890ff'))
-        views = [("前", "front"), ("后", "back"), ("左", "left"), ("右", "right")]
+        views = [
+            (tr("player.view.front"), "front"),
+            (tr("player.view.back"), "back"),
+            (tr("player.view.left"), "left"),
+            (tr("player.view.right"), "right"),
+        ]
         for view_text, view_key in views:
             action = QAction(view_text, self)
             action.triggered.connect(
@@ -119,7 +126,7 @@ class VideoContextMenu(QMenu):
         self.addSeparator()
 
         # 合成导出
-        combine_export_action = QAction("合成导出", self)
+        combine_export_action = QAction(tr("player.menu.combine_export"), self)
         combine_export_action.setIcon(
             qta.icon('mdi.movie-edit', color='#1890ff'))
         combine_export_action.triggered.connect(self.show_combine_export)
@@ -144,11 +151,11 @@ class VideoContextMenu(QMenu):
                           for player in self.parent_widget.players.values())
 
         if any_playing:
-            self.play_pause_action.setText("暂停")
+            self.play_pause_action.setText(tr("player.menu.pause"))
             self.play_pause_action.setIcon(
                 qta.icon('mdi.pause', color='#1890ff'))
         else:
-            self.play_pause_action.setText("播放")
+            self.play_pause_action.setText(tr("player.menu.play"))
             self.play_pause_action.setIcon(
                 qta.icon('mdi.play', color='#1890ff'))
 
@@ -298,7 +305,7 @@ class TeslaCamPlayerWidget(QWidget):
         # 左侧布局
         left_layout = QVBoxLayout()
         # 打开文件夹按钮
-        open_folder_button = QPushButton("打开文件夹", self)
+        open_folder_button = QPushButton(tr("player.open_folder"), self)
         open_folder_button.clicked.connect(
             lambda: self.browse_folder("inputType"))
         left_layout.addWidget(open_folder_button)
@@ -411,12 +418,13 @@ class TeslaCamPlayerWidget(QWidget):
         if new_main == self.current_main_view:
             return
 
-        self.main_view_box.setCurrentText({
-            'front': '前',
-            'back': '后',
-            'left': '左',
-            'right': '右'
-        }[new_main])
+        view_text_map = {
+            'front': tr("player.view.front"),
+            'back': tr("player.view.back"),
+            'left': tr("player.view.left"),
+            'right': tr("player.view.right"),
+        }
+        self.main_view_box.setCurrentText(view_text_map[new_main])
 
         self.glogger.info(f"切换主视角: {self.current_main_view} -> {new_main}")
         self.current_main_view = new_main
@@ -451,7 +459,7 @@ class TeslaCamPlayerWidget(QWidget):
         self.glogger.info("开始播放所有视角")
         for player in self.players.values():
             player.play()
-        self.play_pause_all_btn.setText('暂停')
+        self.play_pause_all_btn.setText(tr("player.pause"))
         # self.play_pause_all_btn.setIcon(self.pause_icon)
         self.play_pause_all_btn.setIcon(qta.icon('mdi.pause', color='#ffffff'))
 
@@ -459,7 +467,7 @@ class TeslaCamPlayerWidget(QWidget):
         self.glogger.info("暂停所有视角")
         for player in self.players.values():
             player.pause()
-        self.play_pause_all_btn.setText('播放')
+        self.play_pause_all_btn.setText(tr("player.play"))
         # self.play_pause_all_btn.setIcon(self.play_icon)
         self.play_pause_all_btn.setIcon(qta.icon('mdi.play', color='#ffffff'))
 
@@ -472,7 +480,7 @@ class TeslaCamPlayerWidget(QWidget):
             self.glogger.info("检测到播放中，执行暂停")
             for player in self.players.values():
                 player.pause()
-            self.play_pause_all_btn.setText('播放')
+            self.play_pause_all_btn.setText(tr("player.play"))
             self.play_pause_all_btn.setIcon(
                 qta.icon('mdi.play', color='#ffffff'))
             return
@@ -492,7 +500,7 @@ class TeslaCamPlayerWidget(QWidget):
         self.glogger.info("执行播放")
         for player in self.players.values():
             player.play()
-        self.play_pause_all_btn.setText('暂停')
+        self.play_pause_all_btn.setText(tr("player.pause"))
         self.play_pause_all_btn.setIcon(
             qta.icon('mdi.pause', color='#ffffff'))
 
@@ -500,7 +508,7 @@ class TeslaCamPlayerWidget(QWidget):
         self.glogger.info("停止所有视角，并标记下次从第一段开始")
         for player in self.players.values():
             player.stop()
-        self.play_pause_all_btn.setText('播放')
+        self.play_pause_all_btn.setText(tr("player.play"))
         # self.play_pause_all_btn.setIcon(self.play_icon)
         self.play_pause_all_btn.setIcon(
             qta.icon('mdi.play', color='#ffffff'))
