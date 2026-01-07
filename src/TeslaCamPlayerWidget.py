@@ -527,7 +527,7 @@ class TeslaCamPlayerWidget(QWidget):
         self.glogger.info("仅停止播放（不改变索引与列表状态）")
         for player in self.players.values():
             player.stop()
-        self.play_pause_all_btn.setText('播放')
+        self.play_pause_all_btn.setText(tr("player.play"))
         self.play_pause_all_btn.setIcon(
             qta.icon('mdi.play', color='#0288D1'))
 
@@ -597,15 +597,20 @@ class TeslaCamPlayerWidget(QWidget):
         for player in self.players.values():
             player.set_position(position)
 
-    def set_main_view(self, zh_view):
-        view = {
-            '前': 'front',
-            '后': 'back',
-            '左': 'left',
-            '右': 'right'
-        }[zh_view]
+    def set_main_view(self, view_text):
+        """根据当前语言下拉框显示文本设置主视角。"""
+        text_to_view = {
+            tr("player.view.front"): 'front',
+            tr("player.view.back"): 'back',
+            tr("player.view.left"): 'left',
+            tr("player.view.right"): 'right',
+        }
+        view = text_to_view.get(view_text)
+        if not view:
+            self.glogger.warning(f"未知主视角文本: {view_text}")
+            return
 
-        self.glogger.info(f"设置主视角: {zh_view} -> {view}")
+        self.glogger.info(f"设置主视角: {view_text} -> {view}")
         self.current_main_view = view
         self.current_view = view
         self.setup_video_widgets()
@@ -613,7 +618,7 @@ class TeslaCamPlayerWidget(QWidget):
         # 同步更新底部下拉框
         if hasattr(self, 'main_view_box'):
             self.main_view_box.blockSignals(True)
-            self.main_view_box.setCurrentText(zh_view)
+            self.main_view_box.setCurrentText(view_text)
             self.main_view_box.blockSignals(False)
 
         # 同步更新右键菜单的勾选状态
@@ -646,7 +651,7 @@ class TeslaCamPlayerWidget(QWidget):
         # pause_btn = QPushButton("⏸ 暂停")
         # pause_btn.clicked.connect(self.pause_all)
 
-        self.play_pause_all_btn = QPushButton("播放")
+        self.play_pause_all_btn = QPushButton(tr("player.play"))
         self.play_pause_all_btn.clicked.connect(self.play_pause_all)
         self.play_pause_all_btn.setToolTip("播放/暂停")
         self.play_pause_all_btn.setIconSize(QSize(18, 18))
@@ -654,9 +659,9 @@ class TeslaCamPlayerWidget(QWidget):
         self.play_pause_all_btn.setIcon(qta.icon('mdi.play', color='#ffffff'))
 
         # stop_btn = QPushButton("⏹ 停止")
-        stop_btn = QPushButton("停止")
+        stop_btn = QPushButton(tr("player.menu.stop"))
         stop_btn.clicked.connect(self.stop_all)
-        stop_btn.setToolTip("停止")
+        stop_btn.setToolTip(tr("player.menu.stop"))
         stop_btn.setIconSize(QSize(18, 18))
         # stop_btn.setIcon(self.stop_icon)
         stop_btn.setIcon(qta.icon('mdi.stop', color='#ffffff'))
@@ -682,11 +687,17 @@ class TeslaCamPlayerWidget(QWidget):
             lambda text: self.set_rate_all(float(text[:-1])))
 
         self.main_view_box = QComboBox()
-        self.main_view_box.setPlaceholderText("主视角")
-        self.main_view_box.setToolTip("主视角")
-        self.main_view_box.addItems(["前", "后", "左", "右"])
+        self.main_view_box.setPlaceholderText(
+            tr("combiner.main_view.placeholder"))
+        self.main_view_box.setToolTip(tr("combiner.main_view.tooltip"))
+        self.main_view_box.addItems([
+            tr("player.view.front"),
+            tr("player.view.back"),
+            tr("player.view.left"),
+            tr("player.view.right"),
+        ])
         self.main_view_box.setMinimumWidth(100)
-        self.main_view_box.setCurrentText("前")
+        self.main_view_box.setCurrentText(tr("player.view.front"))
         self.main_view_box.currentTextChanged.connect(
             lambda text: self.set_main_view(text))
 

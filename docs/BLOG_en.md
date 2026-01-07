@@ -82,6 +82,7 @@ The current version ships with a clean, focused UI and:
 
 - **Bilingual interface (Chinese / English)** – auto-detects system language by default, and you can switch manually under `Settings → Language`.
 - Remembers window size/position and last opened TeslaCam folder so you can pick up where you left off.
+- Optional notification settings including system notifications, email, and WeCom bot integration for important events such as export completion.
 
 #### 5. Built-in update checks
 
@@ -97,6 +98,7 @@ The download happens in a separate, non-blocking dialog with:
 - The direct download URL (with a handy **Copy** button).
 - The local save path (with an **Open Folder** button).
 - Optional proxy settings just for update downloads, stored in your config file.
+- Clean cancellation handling so closing the download dialog or clicking **Cancel** will stop the download without freezing or exiting the main application.
 
 ---
 
