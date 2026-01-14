@@ -7,6 +7,8 @@
 TeslaCamPlayer is a desktop player and manager for Tesla dashcam (TeslaCam / Sentry Mode) video files. 
 It is built with Python and PyQt5, providing a cross‑platform GUI to quickly browse, preview, and export TeslaCam clips.
 
+![TeslaCamPlayer main UI screenshot](imgs/app_img02.png)
+
 > 中文说明：请参见 [README.md](README.md)
 
 ---
