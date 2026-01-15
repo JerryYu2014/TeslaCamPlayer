@@ -98,9 +98,10 @@ class TeslaCamPlayer(QMainWindow):
                 margin: 2px;
                 border-radius: 4px;
             }
+            /* 采用更深的主题蓝色背景和白色文字，保证右侧箭头在 hover 时有足够对比度 */
             QMenuBar::item:selected, QMenuBar::item:hover {
-                background: #e6f7ff;
-                color: #1890ff;
+                background: #1890ff;
+                color: #ffffff;
             }
             QMenu {
                 background: #ffffff;
@@ -113,9 +114,10 @@ class TeslaCamPlayer(QMainWindow):
                 border-radius: 4px;
                 margin: 2px;
             }
+            /* 同样使用深蓝背景 + 白字，提高子菜单箭头和复选框的可见度 */
             QMenu::item:selected {
-                background: #e6f7ff;
-                color: #1890ff;
+                background: #1890ff;
+                color: #ffffff;
             }
             QStatusBar {
                 background: #ffffff;
