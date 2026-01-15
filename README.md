@@ -201,7 +201,7 @@ pyinstaller src/MainWindow.py --windowed --noconfirm --name "TeslaCamPlayer"
 pyinstaller src/MainWindow.py --windowed --noconfirm --strip --name "TeslaCamPlayer"
 
 # 添加图标与资源文件
-pyinstaller src/MainWindow.py --windowed --noconfirm --strip --name "TeslaCamPlayer" --add-data "src/assets/*:assets" --icon="src/assets/logo.ico"
+pyinstaller src/MainWindow.py --windowed --noconfirm --strip --name "TeslaCamPlayer" --add-data "src/assets/logo.ico:assets" --add-data "src/assets/locales/*.json:assets/locales" --icon="src/assets/logo.ico"
 
 # 使用 spec 文件（推荐，统一配置）
 pyinstaller --noconfirm TeslaCamPlayer.spec
@@ -220,8 +220,7 @@ pyinstaller src/MainWindow.py --windowed --noconfirm --name "TeslaCamPlayer"
 pyinstaller src/MainWindow.py --windowed --noconfirm --strip --name "TeslaCamPlayer"
 
 # 图标与资源文件
-pyinstaller src/MainWindow.py --windowed --noconfirm --strip --name "TeslaCamPlayer" \
-  --add-data "src/assets/*:assets" --icon="src/assets/logo.ico"
+pyinstaller src/MainWindow.py --windowed --noconfirm --strip --name "TeslaCamPlayer" --add-data "src/assets/logo.ico:assets" --add-data "src/assets/locales/*.json:assets/locales" --icon="src/assets/logo.ico"
 
 # 使用 spec 文件
 pyinstaller --noconfirm TeslaCamPlayer.spec

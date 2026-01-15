@@ -202,7 +202,7 @@ pyinstaller src/MainWindow.py --windowed --noconfirm --name "TeslaCamPlayer"
 pyinstaller src/MainWindow.py --windowed --noconfirm --strip --name "TeslaCamPlayer"
 
 # Add icon and resources
-pyinstaller src/MainWindow.py --windowed --noconfirm --strip --name "TeslaCamPlayer" --add-data "src/assets/*:assets" --icon="src/assets/logo.ico"
+pyinstaller src/MainWindow.py --windowed --noconfirm --strip --name "TeslaCamPlayer" --add-data "src/assets/logo.ico:assets" --add-data "src/assets/locales/*.json:assets/locales" --icon="src/assets/logo.ico"
 
 # Use the spec file (recommended for consistent builds)
 pyinstaller --noconfirm TeslaCamPlayer.spec
@@ -221,7 +221,7 @@ pyinstaller src/MainWindow.py --windowed --noconfirm --name "TeslaCamPlayer"
 pyinstaller src/MainWindow.py --windowed --noconfirm --strip --name "TeslaCamPlayer"
 
 # Icon and resources
-pyinstaller src/MainWindow.py --windowed --noconfirm --strip --name "TeslaCamPlayer" --add-data "src/assets/*:assets" --icon="src/assets/logo.ico"
+pyinstaller src/MainWindow.py --windowed --noconfirm --strip --name "TeslaCamPlayer" --add-data "src/assets/logo.ico:assets" --add-data "src/assets/locales/*.json:assets/locales" --icon="src/assets/logo.ico"
 
 # Use the spec file
 pyinstaller --noconfirm TeslaCamPlayer.spec
