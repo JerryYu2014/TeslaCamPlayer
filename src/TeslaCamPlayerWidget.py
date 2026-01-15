@@ -43,12 +43,14 @@ class VideoContextMenu(QMenu):
                 margin: 2px;
                 min-height: 20px;
             }
+            /* 使用稍浅的主题蓝背景 + 白字，既保证箭头对比度，又让蓝色图标清晰可见 */
             QMenu::item:selected {
-                background: #e6f7ff;
-                color: #1890ff;
+                background: #40a9ff;
+                color: #ffffff;
             }
             QMenu::item:hover {
-                background: #f5f5f5;
+                background: #e6f7ff;
+                color: #1890ff;
             }
             QMenu::icon {
                 width: 16px;
